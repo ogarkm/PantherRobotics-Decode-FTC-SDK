@@ -86,7 +86,6 @@ import java.util.concurrent.TimeUnit;
  */
 
 @TeleOp(name="Omni Drive To AprilTag", group = "Concept")
-@Disabled
 public class RobotAprilTagOmni extends LinearOpMode
 {
     // Adjust these numbers to suit your robot.
@@ -127,10 +126,10 @@ public class RobotAprilTagOmni extends LinearOpMode
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must match the names assigned during the robot configuration.
         // step (using the FTC Robot Controller app on the phone).
-        frontLeftDrive = hardwareMap.get(DcMotor.class, "fl");
-        frontRightDrive = hardwareMap.get(DcMotor.class, "fr");
-        backLeftDrive = hardwareMap.get(DcMotor.class, "bl");
-        backRightDrive = hardwareMap.get(DcMotor.class, "br");
+        frontLeftDrive = hardwareMap.get(DcMotor.class, "lf");
+        frontRightDrive = hardwareMap.get(DcMotor.class, "rf");
+        backLeftDrive = hardwareMap.get(DcMotor.class, "lb");
+        backRightDrive = hardwareMap.get(DcMotor.class, "rb");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
@@ -191,7 +190,7 @@ public class RobotAprilTagOmni extends LinearOpMode
             }
 
             // If Left Bumper is being pressed, AND we have found the desired target, Drive to target Automatically .
-            if (gamepad1.left_bumper && targetFound) {
+            if (targetFound) {
 
                 // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
                 double  rangeError      = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
