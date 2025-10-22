@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -126,18 +127,23 @@ public class RobotAprilTagOmni extends LinearOpMode
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must match the names assigned during the robot configuration.
         // step (using the FTC Robot Controller app on the phone).
-        frontLeftDrive = hardwareMap.get(DcMotor.class, "lf");
-        frontRightDrive = hardwareMap.get(DcMotor.class, "rf");
-        backLeftDrive = hardwareMap.get(DcMotor.class, "lb");
-        backRightDrive = hardwareMap.get(DcMotor.class, "rb");
+        frontLeftDrive = hardwareMap.get(DcMotor.class, "fl");
+        frontRightDrive = hardwareMap.get(DcMotor.class, "fr");
+        backLeftDrive = hardwareMap.get(DcMotor.class, "bl");
+        backRightDrive = hardwareMap.get(DcMotor.class, "br");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
         frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        backLeftDrive.setDirection(DcMotor.Direction.FORWARD);
         frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
         backRightDrive.setDirection(DcMotor.Direction.FORWARD);
+
+        frontLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         if (USE_WEBCAM)
             setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
@@ -207,8 +213,8 @@ public class RobotAprilTagOmni extends LinearOpMode
 
                 // drive using manual POV Joystick mode.  Slow things down to make the robot more controlable.
                 drive  = -gamepad1.left_stick_y  / 2.0;  // Reduce drive rate to 50%.
-                strafe = -gamepad1.left_stick_x  / 2.0;  // Reduce strafe rate to 50%.
-                turn   = -gamepad1.right_stick_x / 3.0;  // Reduce turn rate to 33%.
+                strafe = gamepad1.left_stick_x  / 2.0;  // Reduce strafe rate to 50%.
+                turn   = gamepad1.right_stick_x / 3.0;  // Reduce turn rate to 33%.
                 telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
             }
             telemetry.update();
@@ -230,10 +236,10 @@ public class RobotAprilTagOmni extends LinearOpMode
      */
     public void moveRobot(double x, double y, double yaw) {
         // Calculate wheel powers.
-        double frontLeftPower    =  x - y - yaw;
-        double frontRightPower   =  x + y + yaw;
-        double backLeftPower     =  x + y - yaw;
-        double backRightPower    =  x - y + yaw;
+        double frontLeftPower    =  x + y + yaw;
+        double frontRightPower   =  x - y - yaw;
+        double backLeftPower     =  x - y + yaw;
+        double backRightPower    =  x + y - yaw;
 
         // Normalize wheel powers to be less than 1.0
         double max = Math.max(Math.abs(frontLeftPower), Math.abs(frontRightPower));

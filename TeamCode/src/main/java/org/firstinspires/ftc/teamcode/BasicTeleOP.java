@@ -19,14 +19,14 @@ public class BasicTeleOP extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         // Motor Declaration
 
-        DcMotor frontLeftMotor = hardwareMap.dcMotor.get("lf");
-        DcMotor backLeftMotor = hardwareMap.dcMotor.get("lb");
-        DcMotor frontRightMotor = hardwareMap.dcMotor.get("rf");
-        DcMotor backRightMotor = hardwareMap.dcMotor.get("rb");
+        DcMotor frontLeftMotor = hardwareMap.dcMotor.get("fl");
+        DcMotor backLeftMotor = hardwareMap.dcMotor.get("bl");
+        DcMotor frontRightMotor = hardwareMap.dcMotor.get("fr");
+        DcMotor backRightMotor = hardwareMap.dcMotor.get("br");
 
         // Reverse the right side motors. This may be wrong for your setup.
         frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
 
         waitForStart();
