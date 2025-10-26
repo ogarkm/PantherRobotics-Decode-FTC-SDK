@@ -2,11 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-<<<<<<< HEAD
-=======
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
->>>>>>> origin/attempt1
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
@@ -31,18 +28,12 @@ public class RobotAprilTagOmni extends LinearOpMode
     final double STRAFE_GAIN      = 0.015;
     final double TURN_GAIN        = 0.01;
 
-<<<<<<< HEAD
-    final double MAX_AUTO_SPEED   = 0.5;
-    final double MAX_AUTO_STRAFE  = 0.5;
-    final double MAX_AUTO_TURN    = 0.3;
-=======
     //  Set the GAIN constants to control the relationship between the measured position error, and how much power is
     //  applied to the drive motors to correct the error.
     //  Drive = Error * Gain    Make these values smaller for smoother control, or larger for a more aggressive response.
     final double SPEED_GAIN  =  0.02  ;   //  Forward Speed Control "Gain". e.g. Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
     final double STRAFE_GAIN =  0.015 ;   //  Strafe Speed Control "Gain".  e.g. Ramp up to 37.5% power at a 25 degree Yaw error.   (0.375 / 25.0)
     final double TURN_GAIN   =  0.01  ;   //  Turn Control "Gain".  e.g. Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
->>>>>>> origin/attempt1
 
     // Robot hardware
     scrimHWMap robot = new scrimHWMap();
@@ -65,12 +56,6 @@ public class RobotAprilTagOmni extends LinearOpMode
         initAprilTag();
         robot.init(hardwareMap);
 
-<<<<<<< HEAD
-        if (USE_WEBCAM) {
-            setManualExposure(6, 250);  // reduce motion blur
-        }
-
-=======
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must match the names assigned during the robot configuration.
         // step (using the FTC Robot Controller app on the phone).
@@ -96,7 +81,6 @@ public class RobotAprilTagOmni extends LinearOpMode
             setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
 
         // Wait for driver to press start
->>>>>>> origin/attempt1
         telemetry.addData("Camera preview on/off", "3 dots, Camera Stream");
         telemetry.addData(">", "Touch START to start OpMode");
         telemetry.update();
@@ -133,47 +117,7 @@ public class RobotAprilTagOmni extends LinearOpMode
 
         while (opModeIsActive())
         {
-<<<<<<< HEAD
-            // ---------- APRILTAG DETECTION ----------
-            targetFound = false;
-            desiredTag  = null;
-
-            double minDistance = 1000;
-            List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-            for (AprilTagDetection detection : currentDetections) {
-                if (detection.metadata != null) {
-                    double distance = detection.ftcPose.range;
-                    if (distance < minDistance) {
-                        desiredTag = detection;
-                        minDistance = distance;
-                        targetFound = true;
-                    }
-                } else {
-                    telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
-                }
-            }
-
-            // ---------- DRIVE LOGIC ----------
-            if (targetFound) {
-                // auto drive
-                double rangeError   = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
-                double headingError = desiredTag.ftcPose.bearing;
-                double yawError     = desiredTag.ftcPose.yaw;
-
-                drive  = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
-                turn   = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
-                strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
-            } else {
-                // manual drive
-                drive  = -gamepad1.left_stick_y  / 2.0;
-                strafe = -gamepad1.left_stick_x  / 2.0;
-                turn   = -gamepad1.right_stick_x / 3.0;
-            }
-
-            // ---------- TELEMETRY ----------
-=======
             // Tell the driver what we see, and what to do.
->>>>>>> origin/attempt1
             if (targetFound) {
                 telemetry.addData("\n>","HOLD Left-Bumper to Drive to Target\n");
                 telemetry.addData("Found", "ID %d (%s)", desiredTag.id, desiredTag.metadata.name);
@@ -182,15 +126,11 @@ public class RobotAprilTagOmni extends LinearOpMode
                 telemetry.addData("Yaw","%3.0f degrees", desiredTag.ftcPose.yaw);
                 telemetry.addData("Auto","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
             } else {
-<<<<<<< HEAD
-                telemetry.addData("\n>","Drive using joysticks to find valid target\n");
-=======
 
                 // drive using manual POV Joystick mode.  Slow things down to make the robot more controlable.
                 drive  = -gamepad1.left_stick_y  / 2.0;  // Reduce drive rate to 50%.
                 strafe = gamepad1.left_stick_x  / 2.0;  // Reduce strafe rate to 50%.
                 turn   = gamepad1.right_stick_x / 3.0;  // Reduce turn rate to 33%.
->>>>>>> origin/attempt1
                 telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
             }
             telemetry.update();
@@ -201,19 +141,11 @@ public class RobotAprilTagOmni extends LinearOpMode
         }
     }
     public void moveRobot(double x, double y, double yaw) {
-<<<<<<< HEAD
-        // Mecanum wheel mixing
-        double frontLeftPower    =  x - y - yaw;
-        double frontRightPower   =  x + y + yaw;
-        double backLeftPower     =  x + y - yaw;
-        double backRightPower    =  x - y + yaw;
-=======
         // Calculate wheel powers.
         double frontLeftPower    =  x + y + yaw;
         double frontRightPower   =  x - y - yaw;
         double backLeftPower     =  x - y + yaw;
         double backRightPower    =  x + y - yaw;
->>>>>>> origin/attempt1
 
         // scale to [-1,1]
         double max = Math.max(Math.abs(frontLeftPower), Math.abs(frontRightPower));
