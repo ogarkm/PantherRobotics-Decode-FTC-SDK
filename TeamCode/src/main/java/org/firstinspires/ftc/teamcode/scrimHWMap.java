@@ -28,10 +28,6 @@ public class scrimHWMap {
         backLeft   = hwMap.get(DcMotorEx.class, "bl");
         backRight  = hwMap.get(DcMotorEx.class, "br");
 
-        shooterLeft  = hwMap.get(DcMotorEx.class, "sL");
-        shooterRight = hwMap.get(DcMotorEx.class, "sR");
-
-        intake  = hwMap.get(DcMotor.class, "intake");
 
 
         // Set motor directions and modes
@@ -40,10 +36,6 @@ public class scrimHWMap {
         backLeft.setDirection(DcMotorEx.Direction.FORWARD);  //BL
         backRight.setDirection(DcMotorEx.Direction.REVERSE); //FL
 
-        shooterLeft.setDirection(DcMotorEx.Direction.FORWARD);
-        shooterRight.setDirection(DcMotorEx.Direction.REVERSE);
-
-        intake.setDirection(DcMotor.Direction.REVERSE);
 
         // Use brake to keep robot stable when no power
         frontLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -51,10 +43,7 @@ public class scrimHWMap {
         backLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
-        shooterLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        shooterRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
 
-        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
         // If your motors support velocity control (REV/Core Hex), you can use RUN_USING_ENCODER
@@ -63,9 +52,5 @@ public class scrimHWMap {
         backLeft.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         backRight.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
-        shooterLeft.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        shooterRight.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-
-        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 }

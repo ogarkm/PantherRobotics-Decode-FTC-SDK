@@ -41,9 +41,6 @@ public class scrimTeleOp extends LinearOpMode {
             double turn   = gamepad1.right_stick_x; // rotation
 
             // apply deadzone
-            driveX = applyDeadzone(driveX, 0.05);
-            driveY = applyDeadzone(driveY, 0.05);
-            turn = applyDeadzone(turn, 0.05);
 
             double multiplier = baseDriveMultiplier;
             if (gamepad1.left_bumper) multiplier *= PRECISION_MULT;
@@ -66,85 +63,11 @@ public class scrimTeleOp extends LinearOpMode {
             }
 
             robot.frontLeft.setPower(fl * multiplier);
-            robot.frontRight.setPower(fr * multiplier);
-            robot.backLeft.setPower(bl * multiplier);
-            robot.backRight.setPower(br * multiplier);
+//            robot.frontRight.setPower(fr * multiplier);
+//            robot.backLeft.setPower(bl * multiplier);
+//            robot.backRight.setPower(br * multiplier);
 
-            // quick stop / zero rotation
-            if (gamepad1.a) {
-                robot.frontLeft.setPower(0);
-                robot.frontRight.setPower(0);
-                robot.backLeft.setPower(0);
-                robot.backRight.setPower(0);
-            }
 
-            // ---------- INTAKE ----------
-            // left_trigger: intake in, left_bumper (on gamepad2) intake out
-            double intakePower = 0.0;
-            if (gamepad2.left_trigger > 0.1) {
-                intakePower = Range.clip(gamepad2.left_trigger, 0.0, 1.0); // in
-            } else if (gamepad2.left_bumper) {
-                intakePower = -0.8; // out
-            } else {
-                intakePower = 0.0;
-            }
-            robot.intake.setPower(intakePower);
-
-            // ---------- SHOOTER ----------
-            // Right bumper toggles shooter on/off (preset)
-            if (gamepad2.right_bumper && gamepad2.right_bumper != gamepad2.right_bumper /*no-op to suppress lint*/) {
-                // noop (keeps lint quiet)
-            }
-            // We'll implement an edge-triggered toggle
-            if (gamepad2.right_bumper && !gamepad2.right_bumper /* placeholder */) {
-                // unreachable - placeholder for conceptual reading
-            }
-
-            // Simpler approach: use X / Y to set presets, B to stop, Dpad +/- to adjust RPM
-            if (gamepad2.x) {
-                shooterOn = true;
-                shooterTargetRPM = 2000; // low preset
-            }
-            if (gamepad2.y) {
-                shooterOn = true;
-                shooterTargetRPM = 3000; // high preset
-            }
-            if (gamepad2.b) {
-                shooterOn = false;
-            }
-
-            if (gamepad2.dpad_up) {
-                shooterTargetRPM += RPM_STEP;
-            } else if (gamepad2.dpad_down) {
-                shooterTargetRPM -= RPM_STEP;
-            }
-
-            shooterTargetRPM = Range.clip(shooterTargetRPM, 0, 6000);
-
-            // If your motors are DcMotorEx and support setVelocity (ticks per second), please convert RPM to ticks/sec.
-            // For an example using REV motor with 28 ticks per revolution, ticksPerRev = 28 * gearRatio etc.
-            // For portability, we set open-loop power proportional to target RPM as a fallback:
-            double shooterPower = 0.0;
-            if (shooterOn) {
-                // map RPM to power (naive mapping — tune for your hardware)
-                shooterPower = shooterTargetRPM / 4000.0; // 4000 rpm -> 1.0 power (example)
-                shooterPower = Range.clip(shooterPower, 0.0, 1.0);
-            } else {
-                shooterPower = 0.0;
-            }
-
-            // If shooter motors are DcMotorEx and you want velocity control:
-            if (robot.shooterLeft instanceof DcMotorEx && robot.shooterRight instanceof DcMotorEx) {
-                DcMotorEx sL = robot.shooterLeft;
-                DcMotorEx sR = robot.shooterRight;
-                // Example: if you have calculated ticksPerMinute, setVelocity accepts ticksPerSecond depending on SDK version.
-                // Here: fallback to setPower for compatibility. Replace with setVelocity(...) if you know your encoder ticks/rev.
-                sL.setPower(shooterPower);
-                sR.setPower(shooterPower);
-            } else {
-                robot.shooterLeft.setPower(shooterPower);
-                robot.shooterRight.setPower(shooterPower);
-            }
 
             // ---------- FEED / INDEXER ----------
             // Right trigger on gamepad2 acts as "feed" — in a physical robot you'd run an indexer servo or a feeder motor.
@@ -157,15 +80,9 @@ public class scrimTeleOp extends LinearOpMode {
             telemetry.addData("Drive multiplier", multiplier);
             telemetry.addData("Shooter on", shooterOn);
             telemetry.addData("Shooter target RPM", shooterTargetRPM);
-            telemetry.addData("Shooter power (open-loop)", shooterPower);
-            telemetry.addData("Intake power", intakePower);
             telemetry.update();
 
-            sleep(20); // small loop delay
+            sleep(20); // smalscrimTeleOpl loop delay
         }
-    }
-
-    private double applyDeadzone(double val, double dead) {
-        return Math.abs(val) < dead ? 0.0 : val;
     }
 }
