@@ -6,15 +6,16 @@
 //
 // #---------------------------#
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.teleOp_test;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
 import java.util.Locale;
 
-@TeleOp
+@TeleOp(name="ODOMETRY_TEST", group="TEST")
 public class OdometryTest extends LinearOpMode {
 
     static final double COUNTS_PER_MOTOR_REV = 537.7; // TODO: TUNE THIS
