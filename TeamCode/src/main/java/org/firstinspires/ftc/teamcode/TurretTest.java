@@ -165,7 +165,7 @@ public class TurretTest extends LinearOpMode {
 
             turretLeft.setPosition(servoPos);
             if (turretRight != null) {
-                turretRight.setPosition(1.0 - servoPos);
+                turretRight.setPosition(1.0 + servoPos);
             }
 
             telemetry.addData("Mode", mode == 1 ? "Manual" : "Auto");
