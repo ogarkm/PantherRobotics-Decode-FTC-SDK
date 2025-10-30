@@ -1,4 +1,3 @@
-
 // #---------------------------#
 //  Basic TeleOP with Turret Control (Should be Automatic tho)
 //
@@ -15,8 +14,8 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
@@ -27,57 +26,84 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
 
-@TeleOp(name="Turret_Test", group="TeleOp")
+@TeleOp(name="Turret Subsystem TeleOP", group="TeleOp")
 public class TurretTest extends LinearOpMode {
 
-    private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
+    // Vision and AprilTag
+    private static final boolean USE_WEBCAM = true;
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
 
-    private static final double MANUAL_TURRET_SPEED_DEG = 1.0; // Degrees per loop
+    // Turret Constants
+    private static final double MANUAL_TURRET_SPEED_DEG = 1.0;
     private static final double SERVO_MIN = 0.0;
     private static final double SERVO_MAX = 1.0;
-    private static final double SERVO_GEAR_RATIO = 3.5;
-    private static final double TURRET_HOME_ANGLE = 0.0; // Home position in degrees
+    private static final double SERVO_TO_TURRET_GEAR_RATIO = 3.5;
+    private static final double TURRET_HOME_ANGLE = 0.0; // Home pos in deg (forward)
 
-    // Proportional gain for turret correction.
-    // Higher values will cause the turret to react faster, but may overshoot.
-    final double TURN_GAIN = 0.02; // Adjusted gain for degree-based control
+    final double TURN_GAIN = 0.02;
+
+    // State machine modes
+    private static final int STATE_SELECT_TEAM = 0;
+    private static final int STATE_SELECT_MODE = 1;
+    private static final int STATE_MANUAL_RUN = 2;
+    private static final int STATE_AUTO_RUN = 3;
 
     @Override
     public void runOpMode() {
-        DcMotor frontLeftMotor = hardwareMap.dcMotor.get("fl");
-        DcMotor backLeftMotor = hardwareMap.dcMotor.get("bl");
-        DcMotor frontRightMotor = hardwareMap.dcMotor.get("fr");
-        DcMotor backRightMotor = hardwareMap.dcMotor.get("br");
-
-        Servo turretLeft = hardwareMap.get(Servo.class, "turretLeft");
+        // --- Hardware Initialization ---
+        DcMotor frontLeftMotor = null;
+        DcMotor backLeftMotor = null;
+        DcMotor frontRightMotor = null;
+        DcMotor backRightMotor = null;
+        Servo turretLeft = null;
         Servo turretRight = null;
 
-        initAprilTag(); // April Tag Init
-
         try {
-            turretRight = hardwareMap.get(Servo.class, "turretRight");
-        } catch (Exception e) {
-            telemetry.addLine("Single servo mode (turretRight not found)");
-        }
-        telemetry.addLine("Awaiting User start... ");
-        telemetry.update();
+            frontLeftMotor = hardwareMap.dcMotor.get("fl");
+            backLeftMotor = hardwareMap.dcMotor.get("bl");
+            frontRightMotor = hardwareMap.dcMotor.get("fr");
+            backRightMotor = hardwareMap.dcMotor.get("br");
+            turretLeft = hardwareMap.get(Servo.class, "turretLeft");
 
+            // Attempt to get the second servo, but don't fail if it's not there.
+            try {
+                turretRight = hardwareMap.get(Servo.class, "turretRight");
+            } catch (Exception e) {
+                telemetry.addLine("Single servo mode (turretRight not found)");
+            }
+
+        } catch (Exception e) {
+            telemetry.addLine("CRITICAL ERROR: A required hardware device is missing.");
+            telemetry.addLine(e.getMessage());
+            telemetry.update();
+            // Terminate the OpMode gracefully if essential hardware is missing.
+            sleep(5000);
+            return;
+        }
+
+        // --- AprilTag Initialization ---
+        initAprilTag();
+
+        // --- Motor Configuration ---
         frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
+
+        // --- Variable Initialization ---
         double turretAngle = TURRET_HOME_ANGLE;
-        int mode = 0;
-        int team_id = 0;
-        int team = 0;
+        int currentState = STATE_SELECT_TEAM;
+        int targetTagId = -1;
+
+        telemetry.addLine("Initialization Complete. Awaiting Start...");
+        telemetry.update();
 
         waitForStart();
 
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
-            // Robot Driving Logic (common to both modes)
+            // Robot Driving Logic (runs in all states)
             double y = -gamepad1.left_stick_y;
             double x = gamepad1.left_stick_x * 1.1;
             double rx = gamepad1.right_stick_x;
@@ -93,82 +119,83 @@ public class TurretTest extends LinearOpMode {
             frontRightMotor.setPower(frontRightPower);
             backRightMotor.setPower(backRightPower);
 
-            while (opModeIsActive() && team_id == 0) {
+
+            // --- State Machine :) ---
+            // TODO: Needs to be hardcoded to TELEOP for COMP
+
+            // State 0: Choose Alliance
+            if (currentState == STATE_SELECT_TEAM) {
                 telemetry.addLine("Press X for Blue team, Y for Red team");
-                telemetry.update();
                 if (gamepad1.x) {
-                    team_id = 20; // Blue Alliance Tag ID
-                    team = 1;
-
+                    targetTagId = 20; // Example Blue Alliance Tag ID
+                    currentState = STATE_SELECT_MODE;
                 } else if (gamepad1.y) {
-                    team_id = 24; // Red Alliance Tag ID
-                    team = 2;
+                    targetTagId = 24; // Example Red Alliance Tag ID
+                    currentState = STATE_SELECT_MODE;
                 }
             }
-            while (opModeIsActive() && mode == 0) { // User chooses mode
-                telemetry.addLine("Press A for manual, B for Auto Turret (with manual drive)");
-                telemetry.update();
+            // State 1: Choose Turret Mode
+            else if (currentState == STATE_SELECT_MODE) {
+                telemetry.addLine("Press A for Manual Turret, B for Auto Turret");
                 if (gamepad1.a) {
-                    mode = 1;
+                    currentState = STATE_MANUAL_RUN;
                 } else if (gamepad1.b) {
-                    mode = 2;
+                    currentState = STATE_AUTO_RUN;
                 }
             }
-
-            // Turret Control Logic
-            if (mode == 1) { // Manual Mode
+            // State 2: Manual Turret Control
+            else if (currentState == STATE_MANUAL_RUN) {
+                telemetry.addData("Mode", "Manual");
                 double turretInput = 0.0;
-
                 if (gamepad1.left_bumper) {
                     turretInput = -1.0;
                 } else if (gamepad1.right_bumper) {
                     turretInput = 1.0;
                 }
-
                 turretAngle += turretInput * MANUAL_TURRET_SPEED_DEG;
+            }
 
-                if (gamepad1.a) {
-                    turretAngle = TURRET_HOME_ANGLE;
-                }
-            } else { // Auto Turret
+            // State 3: Automatic Turret Control
+            else if (currentState == STATE_AUTO_RUN) {
+                telemetry.addData("Mode", "Auto");
                 AprilTagDetection targetTag = null;
                 List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
                 for (AprilTagDetection detection : currentDetections) {
-                    if (detection.metadata != null && detection.id == team_id) {
+                    if (detection.metadata != null && detection.id == targetTagId) {
                         targetTag = detection;
-                        break;
+                        break; // Found the target, stop searching
                     }
                 }
 
                 if (targetTag != null) {
-                    // Yaw error states how far from center the tag is
-                    double yaw = targetTag.ftcPose.yaw;
-
-                    // A positive yaw error = target is to the left
-                    turretAngle -= (yaw * TURN_GAIN);
+                    double yawError = targetTag.ftcPose.yaw;
+                    turretAngle -= (yawError * TURN_GAIN);
 
                     telemetry.addData("Target Found", "ID: %d", targetTag.id);
-                    telemetry.addData("Yaw Error", "%.2f degrees", yaw);
+                    telemetry.addData("Yaw Error", "%.2f degrees", yawError);
                 } else {
-                    telemetry.addLine("Target not visible.");
+                    turretAngle = TURRET_HOME_ANGLE;
+                    telemetry.addLine("Target not visible. Returning to home.");
                 }
             }
 
+            if ((currentState == STATE_MANUAL_RUN || currentState == STATE_AUTO_RUN) && gamepad1.start) {
+                turretAngle = TURRET_HOME_ANGLE;
+            }
+
+
             double wrappedAngle = (turretAngle % 360 + 360) % 360;
 
-            double normalizedTurretPos = wrappedAngle / 360.0;
-            double servoPos = (normalizedTurretPos / SERVO_GEAR_RATIO);
-
-            servoPos = (servoPos % 1.0 + 1.0) % 1.0;
-            servoPos = Range.clip(servoPos, SERVO_MIN, SERVO_MAX);
+            double servoPos = getServoPos(wrappedAngle);
 
             turretLeft.setPosition(servoPos);
             if (turretRight != null) {
-                turretRight.setPosition(1.0 + servoPos);
+                turretRight.setPosition(servoPos);
             }
 
-            telemetry.addData("Mode", mode == 1 ? "Manual" : "Auto");
+
+            // --- Telemetry ---
             telemetry.addData("Turret Angle (Logical)", "%.2f", turretAngle);
             telemetry.addData("Turret Angle (Wrapped)", "%.2f", wrappedAngle);
             telemetry.addData("Servo Position", "%.3f", servoPos);
@@ -176,11 +203,22 @@ public class TurretTest extends LinearOpMode {
         }
     }
 
+    private static double getServoPos(double wrappedAngle) {
+        // --- Servo Position Calculation and Command ---
+        double normalizedTurretPos = wrappedAngle / 360.0;
+        double servoRotations = normalizedTurretPos * SERVO_TO_TURRET_GEAR_RATIO;
+
+        double servoPos = servoRotations % 1.0;
+
+        servoPos = Range.clip(servoPos, SERVO_MIN, SERVO_MAX);
+        return servoPos;
+    }
+
     private void initAprilTag() {
-        // Create the AprilTag processor the easy way.
+        // Create the AprilTag processor.
         aprilTag = AprilTagProcessor.easyCreateWithDefaults();
 
-        // Create the vision portal the easy way.
+        // Create the vision portal.
         if (USE_WEBCAM) {
             visionPortal = VisionPortal.easyCreateWithDefaults(
                     hardwareMap.get(WebcamName.class, "Webcam 1"), aprilTag);
