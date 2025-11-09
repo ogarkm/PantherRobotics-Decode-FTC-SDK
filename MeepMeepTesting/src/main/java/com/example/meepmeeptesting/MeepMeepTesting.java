@@ -7,94 +7,73 @@ import com.noahbres.meepmeep.core.colorscheme.scheme.ColorSchemeBlueDark;
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
-/**
- * MeepMeep Visualization - BLUE NET ZONE ONLY
- */
+// #===================#
+//
+//
+// Someone pls check this
+//
+// #===================#
+
 public class MeepMeepTesting {
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(800);
 
-        // ===== BLUE NET ZONE AUTONOMOUS ONLY =====
+        // === Blue Net Zone Bot (top-left of field) ===
         RoadRunnerBotEntity blueNetBot = new DefaultBotBuilder(meepMeep)
                 .setConstraints(50, 50, Math.toRadians(180), Math.toRadians(180), 15)
                 .setDimensions(14, 16)
                 .setColorScheme(new ColorSchemeBlueDark())
                 .build();
 
-        blueNetBot.runAction(blueNetBot.getDrive().actionBuilder(new Pose2d(-60, -60, Math.toRadians(90)))
-                // === PHASE 1: Score preloaded at net zone ===
-        //I HAVE TO FIX/REDO EVERYTHING IN HERE ITS NOT CORRECT I MESSED UP IF ANYONE WANTS TO TAKE OVER PLEASE DO IM TIRED OF THIS
-                .waitSeconds(1.5) // Shoot 3
+        blueNetBot.runAction(blueNetBot.getDrive().actionBuilder(
+                                // Start top-left (Blue Net side)
+                                new Pose2d(-56, -56, Math.toRadians(225))
+                        )
 
-                // === PHASE 2: Collect LEFT artifact group ===
-                // Go OUT past the balls
-                .turnTo(Math.toRadians(0))
-                .lineToX(-24)
+                        // === PHASE 1: Score preloaded at SH position ===
+                        .lineToY(-12) // drive up into shooting position
+                        .waitSeconds(0.2)
+                        // shoot()
+                        .waitSeconds(3)
 
-                // Come back IN through the 3 balls
-                .turnTo(Math.toRadians(180))
-                .lineToX(-60) // Drive through balls back towards net
 
-                // Return to net zone to score
-                .turnTo(Math.toRadians(90))
-                .lineToY(-50)
-                .waitSeconds(1.5) // Shoot 3
+                        // === PHASE 2: Collect from POS 2 (TOP row) ===
+                        .turnTo(Math.toRadians(-90))
+                        .lineToY(-35)
+                        .waitSeconds(0.5)
+                        // intake()
+                        .lineToY(-45)
 
-                // === PHASE 3: Collect MIDDLE artifact group ===
-                // Go OUT past the balls
-                .lineToY(-36)
-                .turnTo(Math.toRadians(0))
-                .lineToX(-12)
+                        .lineToY(-13)
+                        .waitSeconds(0.3)
+                        // shoot()
+                        .waitSeconds(3)
 
-                // Come back IN through the 3 balls
-                .turnTo(Math.toRadians(180))
-                .lineToX(-60) // Drive through balls back towards net
+                        // === PHASE 3: Collect from POS 3 (Middle row) ===
+                        .turnTo(Math.toRadians(315))
+                        .lineToY(-37)
 
-                // Return to net zone to score
-                .turnTo(Math.toRadians(90))
-                .lineToY(-50)
-                .waitSeconds(1.5) // Shoot 3
+                        // intake() Start Intake
+                        .turnTo(Math.toRadians(-90))
+                        .lineToY(-45)
+                        .waitSeconds(0.3)
 
-                // === PHASE 4: Collect RIGHT artifact group ===
-                // Go OUT past the balls
-                .lineToY(-36)
-                .turnTo(Math.toRadians(0))
-                .lineToX(12)
+                        .lineToY(-35)
+                        .turnTo(Math.toRadians(315))
 
-                // Come back IN through the 3 balls
-                .turnTo(Math.toRadians(180))
-                .lineToX(-60) // Drive through balls back towards net
+                        .lineToY(-13)
+                        // shoot()
+                        .waitSeconds(3)
 
-                // Return to net zone to score
-                .turnTo(Math.toRadians(90))
-                .lineToY(-50)
-                .waitSeconds(1.5) // Shoot 3
-
-                .build());
+                        .build()
+        );
 
         // Configure MeepMeep
-        meepMeep.setBackground(MeepMeep.Background.GRID_GRAY)
+        meepMeep.setBackground(MeepMeep.Background.FIELD_DECODE_OFFICIAL)
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
                 .addEntity(blueNetBot)
                 .start();
     }
-}
 
-/*
- * ========== BLUE NET ZONE PATH (CORRECT) ==========
- *
- * Starting position: Bottom left corner (-60, -60)
- * Net zone scoring: (-60, -50)
- *
- * Strategy for EACH artifact group:
- * 1. From net zone, drive OUT (away from net, towards center)
- * 2. Position past the artifact group
- * 3. Turn around (face back towards net)
- * 4. Drive IN through the 3 balls towards the net (collecting them)
- * 5. Return to net zone
- * 6. Score
- * 7. Repeat for next group
- *
- * This way the robot drives THROUGH the balls while heading back to score!
- */
+}
