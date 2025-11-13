@@ -56,13 +56,35 @@ public class Constants {
         public static final double TURN_kI = 0.0;
         public static final double TURN_kD = 0.0;
 
-        public static final double NORMAL_SPEED_MULTIPLIER = 1.0;
-        public static final double PRECISION_SPEED_MULTIPLIER = 0.4;
+        public static final double NORMAL_SPEED_MULTIPLIER = 0.5;
+        public static final double PRECISION_SPEED_MULTIPLIER = 0.2;
         public static final double TURBO_SPEED_MULTIPLIER = 1.0;
+    }
 
+    public static class LaunchConstants {
         public static final double LAUNCH_MAX = 1.0;
         public static final double LAUNCH_MID = 0.6;
         public static final double LAUNCH_LOW = 0.2;
+    }
+    public static class FieldConstants {
+        public static final int redAprilTagID = 24;
+        public static final int blueAprilTagID = 24;
+        public static final int PGPAprilTagID = 24;
+        public static final int GPPAprilTagID = 24;
+        public static final int PPGAprilTagID = 24;
+
+    }
+
+    public static class AutoAlignConstants {
+        public static final double targetOffset = 6.0;
+
+        public static final double pX = 0.03;
+        public static final double pY = 0.05;
+        public static final double pYaw = 0.02;
+
+        public static final double xCorrectionPower = 0.4;
+        public static final double yCorrectionPower = 0.4;
+        public static final double yawCorrectionPower = 0.4;
     }
 
     // Controller Constants
