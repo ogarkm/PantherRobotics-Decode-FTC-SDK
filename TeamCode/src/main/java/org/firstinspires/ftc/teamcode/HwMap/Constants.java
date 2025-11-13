@@ -34,6 +34,7 @@ public class Constants {
 
         public static DcMotor.RunMode AUTON_RUNMODE = DcMotor.RunMode.RUN_USING_ENCODER;
 
+        public static final double APPROXIMATE_DISTANCE_PER_TILE = 24.73;
         public static final double TRACK_WIDTH = 13.5; // inches (distance between left and right wheels)
         public static final double WHEEL_BASE = 13.5; // inches (distance between front and back wheels)
         public static final double WHEEL_DIAMETER = 4.0; // inches

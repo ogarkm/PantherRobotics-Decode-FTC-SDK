@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.HwMap.Constants.DriveConstants;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.HwMap.Constants;
 
@@ -17,6 +18,7 @@ public class hwMap {
 
     //intake
 
+    public Servo stopper;
     public DcMotor intake;
     public DcMotor rlauncher;
     public DcMotor llauncher;
@@ -71,12 +73,20 @@ public class hwMap {
     }
 
     public void setIntakePower(double intakePower) {
-        frontLeftMotor.setPower(intakePower);
+        intake.setPower(intakePower);
     }
 
     public void setLauncherPower(double launchPower) {
         llauncher.setPower(launchPower);
         rlauncher.setPower(launchPower);
+    }
+
+    public void servoOpen(){
+        stopper.setPosition(1);
+    }
+
+    public void servoClose(){
+        stopper.setPosition(0);
     }
 
     public void stopMotors() {
@@ -85,7 +95,6 @@ public class hwMap {
 
     public void resetEncoders() {
         setMotorModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        setMotorModes(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public int[] getEncoderPositions() {
