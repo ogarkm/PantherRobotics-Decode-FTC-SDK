@@ -24,7 +24,7 @@ import org.firstinspires.ftc.teamcode.HwMap.hwMap;
 
 import java.util.List;
 
-@TeleOp(name="Mecanum_Strafe_Test", group="TEST")
+@TeleOp(name="Mecanum_Strafe_Test", group="TeleOp")
 public class TeleOP extends LinearOpMode {
 
     hwMap hw;
@@ -32,13 +32,8 @@ public class TeleOP extends LinearOpMode {
     private AprilTagProcessor aprilTag;
     private static final boolean USE_WEBCAM = true;
 
-
-    // Mode = 1 = Linked Mode (Intake and Launcher)
-    // Mode = 2 = UnLinked Mode
-
-    public int mode = 1;
-
-    private double launchPower;
+    private double launchPower = 0.0;
+    private double launchMode;
 
 
     @Override
@@ -68,11 +63,15 @@ public class TeleOP extends LinearOpMode {
                 intake(-1);
             }
             else {intake(0);}
+            
             //launch
-            if (gamepad1.a) {
-                launch(launchPower);
+            if (gamepad1.a && launchPower == 0.0) {
+                launchPower = launchMode;
+            } else if (gamepad1.a && launchPower != 0.0) {
+                launchPower = 0.0;
             }
-            else {launch(0);}
+            launch(launchPower);
+
             //precision
             if (gamepad1.left_bumper) {
                 drive(x, y, rx);
@@ -107,11 +106,9 @@ public class TeleOP extends LinearOpMode {
                 }
             }
 
-            if (gamepad1.x) {launchPower = Constants.LaunchConstants.LAUNCH_MAX;}
-            if (gamepad1.y) {launchPower = Constants.LaunchConstants.LAUNCH_MID;}
-            if (gamepad1.b) {launchPower = Constants.LaunchConstants.LAUNCH_LOW;}
-
-            if (gamepad1.start) { if (mode == 1) {mode = 2;} else {mode = 1;} } //mode switcher
+            if (gamepad1.x) {launchMode = Constants.LaunchConstants.LAUNCH_MAX;}
+            if (gamepad1.y) {launchMode = Constants.LaunchConstants.LAUNCH_MID;}
+            if (gamepad1.b) {launchMode = Constants.LaunchConstants.LAUNCH_LOW;}
 
         }
     }

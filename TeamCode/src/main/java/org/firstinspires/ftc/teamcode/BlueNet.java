@@ -28,6 +28,8 @@ public class BlueNet extends LinearOpMode {
         auto.strafe(-10);
         robot.setIntakePower(1);
         auto.drive(40);
+        auto.intakeOn(); // currently has the launcher on very low power running in reverse to shots...
+        auto.intakeOff(); 
         //this will be done as we test
         }
 }

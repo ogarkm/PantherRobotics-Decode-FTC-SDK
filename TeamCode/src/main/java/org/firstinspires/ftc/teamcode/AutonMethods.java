@@ -58,4 +58,13 @@ public class AutonMethods extends LinearOpMode {
         robot.setIntakePower(0);
         robot.setLauncherPower(0);
     }
+
+    public void intakeOn(){
+        robot.setLauncherPower(-0.1);
+        robot.setIntakePower(1);
+    }
+    public void intakeOff(){
+        robot.setLauncherPower(0);
+        robot.setIntakePower(0);
+    }
 }
