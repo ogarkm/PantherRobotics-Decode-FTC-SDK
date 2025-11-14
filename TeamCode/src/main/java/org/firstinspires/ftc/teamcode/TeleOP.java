@@ -55,10 +55,10 @@ public class TeleOP extends LinearOpMode {
 
         while (opModeIsActive()) {
             double y = -gamepad1.left_stick_y;
-            double x = gamepad1.left_stick_x * 1.1;
+            double x = gamepad1.left_stick_x;
             double rx = gamepad1.right_stick_x;
 
-            drive(x, y, rx, Constants.DriveConstants.NORMAL_SPEED_MULTIPLIER);
+            drive(x, y, rx);
 
             //intake
             if (gamepad1.right_trigger > 0) {
@@ -75,9 +75,9 @@ public class TeleOP extends LinearOpMode {
             else {launch(0);}
             //precision
             if (gamepad1.left_bumper) {
-                drive(x, y, rx, Constants.DriveConstants.PRECISION_SPEED_MULTIPLIER);
+                drive(x, y, rx);
             } else if (gamepad1.right_bumper) {
-                drive(x, y, rx, Constants.DriveConstants.TURBO_SPEED_MULTIPLIER);
+                drive(x, y, rx);
             } else if (gamepad1.right_stick_button) {
                 List<AprilTagDetection> detections = aprilTag.getDetections();
                 AprilTagDetection targetTag = null;
@@ -102,7 +102,7 @@ public class TeleOP extends LinearOpMode {
                     double yPower = Range.clip(forwardError * Constants.AutoAlignConstants.pY, -Constants.AutoAlignConstants.yCorrectionPower, Constants.AutoAlignConstants.yCorrectionPower);
                     double rxPower = Range.clip(-yawError * Constants.AutoAlignConstants.pYaw, -Constants.AutoAlignConstants.yawCorrectionPower, Constants.AutoAlignConstants.yawCorrectionPower);
 
-                    drive(xPower, yPower, rxPower, Constants.DriveConstants.NORMAL_SPEED_MULTIPLIER);
+                    drive(xPower, yPower, rxPower);
 
                 }
             }
@@ -128,12 +128,11 @@ public class TeleOP extends LinearOpMode {
         }
     }
 
-    private void drive(double x, double y, double rx, double mult) {
-        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1) * mult;
-        double frontLeftPower = (y + x + rx) / denominator;
-        double backLeftPower = (y - x + rx) / denominator;
-        double frontRightPower = (y - x - rx) / denominator;
-        double backRightPower = (y + x - rx) / denominator;
+    private void drive(double x, double y, double rx) {
+        double frontLeftPower = (y + x + rx) ;
+        double backLeftPower = (y - x + rx) ;
+        double frontRightPower = (y - x - rx);
+        double backRightPower = (y + x - rx);
 
         hw.setMotorPowers(frontLeftPower, frontRightPower, backLeftPower, backRightPower);
     }
