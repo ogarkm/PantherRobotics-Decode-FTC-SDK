@@ -27,7 +27,7 @@ import java.util.List;
 @TeleOp(name="Mecanum_Strafe_Test", group="TEST")
 public class TeleOP extends LinearOpMode {
 
-    hwMap hw = new hwMap(hardwareMap);
+    hwMap hw;
     private VisionPortal visionPortal;
     private AprilTagProcessor aprilTag;
     private static final boolean USE_WEBCAM = true;
@@ -40,14 +40,16 @@ public class TeleOP extends LinearOpMode {
 
     private double launchPower;
 
+
     @Override
     public void runOpMode() throws InterruptedException {
+        hw = new hwMap(hardwareMap);
         initAprilTag();
         waitForStart();
         telemetry.addLine("Click A on TeleOP start to switch to unlinked mode");
         telemetry.update();
 
-        launchPower = Constants.LaunchConstants.LAUNCH_MID;
+        launchPower = Constants.LaunchConstants.LAUNCH_MAX;
 
         if (isStopRequested()) return;
 
@@ -65,13 +67,12 @@ public class TeleOP extends LinearOpMode {
             else if (gamepad1.left_trigger > 0) {
                 intake(-1);
             }
+            else {intake(0);}
             //launch
-            if (mode == 1 && (gamepad1.left_trigger > 0 || gamepad1.right_trigger > 0)) {
+            if (gamepad1.a) {
                 launch(launchPower);
             }
-            else if (mode == 2 && gamepad1.a) {
-                launch(launchPower);
-            }
+            else {launch(0);}
             //precision
             if (gamepad1.left_bumper) {
                 drive(x, y, rx, Constants.DriveConstants.PRECISION_SPEED_MULTIPLIER);
@@ -111,7 +112,7 @@ public class TeleOP extends LinearOpMode {
             if (gamepad1.b) {launchPower = Constants.LaunchConstants.LAUNCH_LOW;}
 
             if (gamepad1.start) { if (mode == 1) {mode = 2;} else {mode = 1;} } //mode switcher
-            
+
         }
     }
 

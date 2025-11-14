@@ -18,7 +18,7 @@ public class AutonMethods extends LinearOpMode {
     }
     public void drive(double d){
         newTarget=getTicks(d);
-        robot.resetEncoders();
+
 
         robot.frontRightMotor.setTargetPosition((int)newTarget);
         robot.frontLeftMotor.setTargetPosition((int)newTarget);
@@ -31,7 +31,6 @@ public class AutonMethods extends LinearOpMode {
 
     public void turn(double d){
         newTarget=getTicks(d);
-        robot.resetEncoders();
 
         robot.frontRightMotor.setTargetPosition(-(int)newTarget);
         robot.frontLeftMotor.setTargetPosition((int)newTarget);
@@ -43,7 +42,6 @@ public class AutonMethods extends LinearOpMode {
     }
     public void strafe(double d){
         newTarget=getTicks(d);
-        robot.resetEncoders();
 
         robot.frontRightMotor.setTargetPosition(-(int)newTarget);
         robot.frontLeftMotor.setTargetPosition((int)newTarget);
@@ -55,11 +53,9 @@ public class AutonMethods extends LinearOpMode {
     }
     public void shoot(){
         robot.setLauncherPower(1);
-        robot.servoOpen();
         robot.setIntakePower(1);
         sleep(2000);
         robot.setIntakePower(0);
-        robot.servoClose();
         robot.setLauncherPower(0);
     }
 }

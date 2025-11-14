@@ -14,9 +14,6 @@ public class Constants {
 
         public static final String INTAKE = "intake";
 
-        public static final String LEFT_LAUNCHER = "flauncher";
-        public static final String RIGHT_LAUNCHER = "rlauncher";
-
         public static final DcMotorSimple.Direction FRONT_LEFT_DIRECTION = DcMotorSimple.Direction.REVERSE;
         public static final DcMotorSimple.Direction FRONT_RIGHT_DIRECTION = DcMotorSimple.Direction.FORWARD;
         public static final DcMotorSimple.Direction BACK_LEFT_DIRECTION = DcMotorSimple.Direction.REVERSE;
@@ -65,13 +62,17 @@ public class Constants {
         public static final double LAUNCH_MAX = 1.0;
         public static final double LAUNCH_MID = 0.6;
         public static final double LAUNCH_LOW = 0.2;
+
+        public static final String LEFT_LAUNCHER = "llauncher";
+        public static final String RIGHT_LAUNCHER = "rlauncher";
+
     }
     public static class FieldConstants {
         public static final int redAprilTagID = 24;
-        public static final int blueAprilTagID = 24;
-        public static final int PGPAprilTagID = 24;
-        public static final int GPPAprilTagID = 24;
-        public static final int PPGAprilTagID = 24;
+        public static final int blueAprilTagID = 20;
+        public static final int PGPAprilTagID = 22;
+        public static final int GPPAprilTagID = 21;
+        public static final int PPGAprilTagID = 23;
 
     }
 

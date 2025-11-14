@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.HwMap;
 import static org.firstinspires.ftc.teamcode.HwMap.Constants.DriveConstants;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -10,24 +11,22 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.HwMap.Constants;
 
 public class hwMap {
-    public DcMotor frontLeftMotor;
-    public DcMotor backLeftMotor;
-    public DcMotor frontRightMotor;
-    public DcMotor backRightMotor;
+    public DcMotorEx frontLeftMotor;
+    public DcMotorEx backLeftMotor;
+    public DcMotorEx frontRightMotor;
+    public DcMotorEx backRightMotor;
 
 
     //intake
-
-    public Servo stopper;
     public DcMotor intake;
     public DcMotor rlauncher;
     public DcMotor llauncher;
 
     public hwMap(HardwareMap hardwareMap) {
-        frontLeftMotor = hardwareMap.dcMotor.get(DriveConstants.FRONT_LEFT_MOTOR);
-        backLeftMotor = hardwareMap.dcMotor.get(DriveConstants.BACK_LEFT_MOTOR);
-        frontRightMotor = hardwareMap.dcMotor.get(DriveConstants.FRONT_RIGHT_MOTOR);
-        backRightMotor = hardwareMap.dcMotor.get(DriveConstants.BACK_RIGHT_MOTOR);
+        frontLeftMotor = (DcMotorEx) hardwareMap.dcMotor.get(DriveConstants.FRONT_LEFT_MOTOR);
+        backLeftMotor = (DcMotorEx) hardwareMap.dcMotor.get(DriveConstants.BACK_LEFT_MOTOR);
+        frontRightMotor = (DcMotorEx) hardwareMap.dcMotor.get(DriveConstants.FRONT_RIGHT_MOTOR);
+        backRightMotor = (DcMotorEx) hardwareMap.dcMotor.get(DriveConstants.BACK_RIGHT_MOTOR);
 
         frontLeftMotor.setDirection(DriveConstants.FRONT_LEFT_DIRECTION);
         backLeftMotor.setDirection(DriveConstants.BACK_LEFT_DIRECTION);
@@ -40,8 +39,8 @@ public class hwMap {
         intake.setDirection(DriveConstants.INTAKE_DIR);
 
 
-        rlauncher = hardwareMap.dcMotor.get(DriveConstants.RIGHT_LAUNCHER);
-        llauncher = hardwareMap.dcMotor.get(DriveConstants.LEFT_LAUNCHER);
+        rlauncher = hardwareMap.dcMotor.get(Constants.LaunchConstants.RIGHT_LAUNCHER);
+        llauncher = hardwareMap.dcMotor.get(Constants.LaunchConstants.LEFT_LAUNCHER);
 
         rlauncher.setDirection(DriveConstants.R_LAUNCH_DIR);
         llauncher.setDirection(DriveConstants.F_LAUNCH_DIR);
@@ -81,28 +80,5 @@ public class hwMap {
         rlauncher.setPower(launchPower);
     }
 
-    public void servoOpen(){
-        stopper.setPosition(1);
-    }
 
-    public void servoClose(){
-        stopper.setPosition(0);
-    }
-
-    public void stopMotors() {
-        setMotorPowers(0, 0, 0, 0);
-    }
-
-    public void resetEncoders() {
-        setMotorModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    }
-
-    public int[] getEncoderPositions() {
-        return new int[] {
-                frontLeftMotor.getCurrentPosition(),
-                frontRightMotor.getCurrentPosition(),
-                backLeftMotor.getCurrentPosition(),
-                backRightMotor.getCurrentPosition()
-        };
-    }
 }
