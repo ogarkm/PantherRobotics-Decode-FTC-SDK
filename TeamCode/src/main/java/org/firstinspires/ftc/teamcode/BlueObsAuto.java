@@ -13,30 +13,28 @@ import org.firstinspires.ftc.teamcode.HwMap.Constants;
 import org.firstinspires.ftc.teamcode.HwMap.hwMap;
 import org.firstinspires.ftc.vision.VisionPortal;
 
-@Autonomous(name = "BlueObsAuto")
+@Autonomous(name = "RedObsAuto")
 public class BlueObsAuto extends LinearOpMode {
-    AutonMethods auto;
     @Override
     public void runOpMode() throws InterruptedException{
-        auto = new AutonMethods();
+        hwMap hw = new hwMap(hardwareMap);
         waitForStart();
-
-        //auto.strafe(10);
-        auto.turn(10);
-        sleep(1000);
-        /*auto.turn(30);
-        auto.shootOn();
+        hw.drive(-20);
+        sleep(2000);
+        hw.shootOn();
         sleep(3000);
-        auto.intakeOn();
-        sleep(100);
-        auto.intakeOff();
-        auto.intakeOn();
-        sleep(100);
-        auto.intakeOff();
-        auto.intakeOn();
-        sleep(100);
-        auto.intakeOff();
+        hw.intakeOn();
+        sleep(700);
+        hw.intakeOff();
         sleep(500);
-        auto.shootOff();*/
+        hw.intakeOn();
+        sleep(500);
+        hw.intakeOff();
+        sleep(500);
+        hw.intakeOn();
+        sleep(500);
+        hw.intakeOff();
+        sleep(500);
+        hw.shootOff();
     }
 }

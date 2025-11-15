@@ -22,6 +22,10 @@ public class hwMap {
     public DcMotor rlauncher;
     public DcMotor llauncher;
 
+    double ticks = Constants.DriveConstants.TICKS_PER_REVOLUTION;
+    double tl = Constants.DriveConstants.APPROXIMATE_DISTANCE_PER_TILE;
+    double newTarget;
+
     public hwMap(HardwareMap hardwareMap) {
         frontLeftMotor = (DcMotorEx) hardwareMap.dcMotor.get(DriveConstants.FRONT_LEFT_MOTOR);
         backLeftMotor = (DcMotorEx) hardwareMap.dcMotor.get(DriveConstants.BACK_LEFT_MOTOR);
@@ -79,6 +83,61 @@ public class hwMap {
         llauncher.setPower(launchPower);
         rlauncher.setPower(launchPower);
     }
+    public int getTicks(double distance) {
+        return (int) ((ticks*distance)/(Math.PI*4));
+    }
+    public void drive(double d){
+
+        newTarget=getTicks(d);
 
 
+        frontRightMotor.setTargetPosition((int)newTarget);
+        frontLeftMotor.setTargetPosition((int)newTarget);
+        backRightMotor.setTargetPosition((int)newTarget);
+        backLeftMotor.setTargetPosition((int)newTarget);
+
+        setMotorPowers(1,1,1,1);
+        setMotorModes(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+    public void turn(double d){
+
+        newTarget=getTicks(d);
+
+        frontRightMotor.setTargetPosition(-(int)newTarget);
+        frontLeftMotor.setTargetPosition((int)newTarget);
+        backRightMotor.setTargetPosition(-(int)newTarget);
+        backLeftMotor.setTargetPosition((int)newTarget);
+
+        setMotorModes(DcMotor.RunMode.RUN_TO_POSITION);
+        setMotorPowers(1,1,1,1);
+    }
+    public void strafe(double d){
+
+        newTarget=getTicks(d);
+
+        frontRightMotor.setTargetPosition(-(int)newTarget);
+        frontLeftMotor.setTargetPosition((int)newTarget);
+        backRightMotor.setTargetPosition((int)newTarget);
+        backLeftMotor.setTargetPosition(-(int)newTarget);
+
+        setMotorModes(DcMotor.RunMode.RUN_TO_POSITION);
+        setMotorPowers(1,1,1,1);
+    }
+    public void shootOn(){
+
+        setLauncherPower(.37);
+    }
+
+    public void shootOff(){
+        setLauncherPower(0);
+        setIntakePower(0);
+    }
+
+    public void intakeOn(){
+        setIntakePower(1);
+    }
+    public void intakeOff(){
+        setIntakePower(0);
+    }
 }

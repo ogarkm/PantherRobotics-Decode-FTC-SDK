@@ -16,19 +16,18 @@ import org.firstinspires.ftc.vision.VisionPortal;
 @Autonomous(name = "BlueNet")
 public class BlueNet extends LinearOpMode {
     hwMap robot = new hwMap(hardwareMap);
-    AutonMethods auto = new AutonMethods();
     @Override
     public void runOpMode() throws InterruptedException{
         waitForStart();
 
-        auto.drive(62.9523025);
+        robot.drive(62.9523025);
         sleep(2000);
-        auto.turn(20);
-        auto.strafe(-10);
+        robot.turn(20);
+        robot.strafe(-10);
         robot.setIntakePower(1);
-        auto.drive(40);
-        auto.intakeOn(); // currently has the launcher on very low power running in reverse to shots...
-        auto.intakeOff();
+        robot.drive(40);
+        robot.intakeOff();
+        robot.intakeOn(); // currently has the launcher on very low power running in reverse to shots...
         //this will be done as we test
     }
 }
