@@ -15,10 +15,11 @@ import org.firstinspires.ftc.vision.VisionPortal;
 
 @Autonomous(name = "RedNet")
 public class RedNet extends LinearOpMode {
-    hwMap robot = new hwMap(hardwareMap);
+    hwMap robot;
     AutonMethods auto = new AutonMethods();
     @Override
     public void runOpMode() throws InterruptedException{
+         robot = new hwMap(hardwareMap);
         waitForStart();
 
         auto.drive(62.9523025);

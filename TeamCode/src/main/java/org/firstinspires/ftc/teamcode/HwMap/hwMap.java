@@ -28,10 +28,10 @@ public class hwMap {
         frontRightMotor = (DcMotorEx) hardwareMap.dcMotor.get(DriveConstants.FRONT_RIGHT_MOTOR);
         backRightMotor = (DcMotorEx) hardwareMap.dcMotor.get(DriveConstants.BACK_RIGHT_MOTOR);
 
-        frontLeftMotor.setDirection(DriveConstants.FRONT_LEFT_DIRECTION);
-        backLeftMotor.setDirection(DriveConstants.BACK_LEFT_DIRECTION);
-        frontRightMotor.setDirection(DriveConstants.FRONT_RIGHT_DIRECTION);
-        backRightMotor.setDirection(DriveConstants.BACK_RIGHT_DIRECTION);
+        frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontRightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        backRightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         //intake
         intake = hardwareMap.dcMotor.get(DriveConstants.INTAKE);

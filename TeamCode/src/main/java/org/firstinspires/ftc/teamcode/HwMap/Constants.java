@@ -60,7 +60,7 @@ public class Constants {
 
     public static class LaunchConstants {
         public static final double LAUNCH_MAX = 1.0;
-        public static final double LAUNCH_MID = 0.6;
+        public static final double LAUNCH_MID = 0.5;
         public static final double LAUNCH_LOW = 0.2;
 
         public static final String LEFT_LAUNCHER = "llauncher";

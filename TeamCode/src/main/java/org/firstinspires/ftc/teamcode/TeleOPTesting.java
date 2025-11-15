@@ -24,8 +24,8 @@ import org.firstinspires.ftc.teamcode.HwMap.hwMap;
 
 import java.util.List;
 
-@TeleOp(name="Mecanum_Strafe_Test", group="TEST")
-public class TeleOP extends LinearOpMode {
+@TeleOp(name="Tester", group="TEST")
+public class TeleOPTesting extends LinearOpMode {
 
     hwMap hw;
     private VisionPortal visionPortal;
@@ -49,12 +49,12 @@ public class TeleOP extends LinearOpMode {
         telemetry.addLine("Click A on TeleOP start to switch to unlinked mode");
         telemetry.update();
 
-        launchPower = Constants.LaunchConstants.LAUNCH_MID;
+        launchPower = Constants.LaunchConstants.LAUNCH_MAX;
 
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
-            double y = -gamepad1.left_stick_y;
+            double y = gamepad1.left_stick_y;
             double x = gamepad1.left_stick_x;
             double rx = gamepad1.right_stick_x;
 
@@ -62,15 +62,18 @@ public class TeleOP extends LinearOpMode {
 
             //intake
             if (gamepad1.right_trigger > 0) {
-                intake(1);
+                hw.frontLeftMotor.setPower(1);
             }
             else if (gamepad1.left_trigger > 0) {
-                intake(-1);
+                hw.frontRightMotor.setPower(1);
             }
             else {intake(0);}
             //launch
             if (gamepad1.a) {
-                launch(launchPower);
+                hw.backLeftMotor.setPower(1);
+            }
+            if (gamepad1.b) {
+                hw.backRightMotor.setPower(1);
             }
             else {launch(0);}
             //precision
@@ -131,8 +134,8 @@ public class TeleOP extends LinearOpMode {
     private void drive(double x, double y, double rx) {
         double frontLeftPower = (y + x + rx) ;
         double backLeftPower = (y - x + rx) ;
-        double frontRightPower = (y - x - rx);
-        double backRightPower = (y + x - rx);
+        double frontRightPower = (-y - x - rx);
+        double backRightPower = (-y + x - rx);
 
         hw.setMotorPowers(frontLeftPower, frontRightPower, backLeftPower, backRightPower);
     }
