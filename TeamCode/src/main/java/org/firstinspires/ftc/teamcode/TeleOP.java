@@ -63,7 +63,7 @@ public class TeleOP extends LinearOpMode {
                 intake(-1);
             }
             else {intake(0);}
-            
+
             //launch
             if (gamepad1.a && launchPower == 0.0) {
                 launchPower = launchMode;

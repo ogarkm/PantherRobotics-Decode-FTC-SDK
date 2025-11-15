@@ -19,7 +19,7 @@ public class RedNet extends LinearOpMode {
     AutonMethods auto = new AutonMethods();
     @Override
     public void runOpMode() throws InterruptedException{
-         robot = new hwMap(hardwareMap);
+        robot = new hwMap(hardwareMap);
         waitForStart();
 
         auto.drive(62.9523025);
@@ -30,7 +30,7 @@ public class RedNet extends LinearOpMode {
         robot.setIntakePower(1);
         auto.drive(40);
         auto.intakeOn(); // currently has the launcher on very low power running in reverse to shots...
-        auto.intakeOff(); 
+        auto.intakeOff();
         //this will be done as we test
     }
 }
