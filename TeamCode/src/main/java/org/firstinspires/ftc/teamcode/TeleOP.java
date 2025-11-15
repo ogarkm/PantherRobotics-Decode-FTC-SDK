@@ -47,14 +47,14 @@ public class TeleOP extends LinearOpMode {
             // launch toggle
             if (gamepad2.a && launchPower == 0.0) {
                 launchPower = launchMode;
-            } else if (gamepad2.a && launchPower != 0.0) {
+            }
+            else{
                 launchPower = 0.0;
             }
             launch(launchPower);
 
             // set launch mode
             if (gamepad2.x) launchMode = Constants.LaunchConstants.LAUNCH_MID;
-            if (gamepad2.y) launchMode = Constants.LaunchConstants.LAUNCH_MAX;
             if (gamepad2.b) launchMode = Constants.LaunchConstants.LAUNCH_LOW;
         }
     }

@@ -23,7 +23,6 @@ public class BlueNet extends LinearOpMode {
 
         auto.drive(62.9523025);
         sleep(2000);
-        auto.shoot();
         auto.turn(20);
         auto.strafe(-10);
         robot.setIntakePower(1);

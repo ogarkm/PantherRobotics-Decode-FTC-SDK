@@ -13,23 +13,30 @@ import org.firstinspires.ftc.teamcode.HwMap.Constants;
 import org.firstinspires.ftc.teamcode.HwMap.hwMap;
 import org.firstinspires.ftc.vision.VisionPortal;
 
-@Autonomous(name = "RedNet")
-public class RedNet extends LinearOpMode {
-    hwMap robot;
-    AutonMethods auto = new AutonMethods();
+@Autonomous(name = "BlueObsAuto")
+public class BlueObsAuto extends LinearOpMode {
+    AutonMethods auto;
     @Override
     public void runOpMode() throws InterruptedException{
-        robot = new hwMap(hardwareMap);
+        auto = new AutonMethods();
         waitForStart();
 
-        auto.drive(62.9523025);
-        sleep(2000);
-        auto.turn(-20);
-        auto.strafe(10);
-        robot.setIntakePower(1);
-        auto.drive(40);
-        auto.intakeOn(); // currently has the launcher on very low power running in reverse to shots...
+        //auto.strafe(10);
+        auto.turn(10);
+        sleep(1000);
+        /*auto.turn(30);
+        auto.shootOn();
+        sleep(3000);
+        auto.intakeOn();
+        sleep(100);
         auto.intakeOff();
-        //this will be done as we test
+        auto.intakeOn();
+        sleep(100);
+        auto.intakeOff();
+        auto.intakeOn();
+        sleep(100);
+        auto.intakeOff();
+        sleep(500);
+        auto.shootOff();*/
     }
 }
