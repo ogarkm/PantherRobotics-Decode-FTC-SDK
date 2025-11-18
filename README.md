@@ -1,4 +1,8 @@
-# Road Runner Quickstart
+# Transfer System
 
-Check out the [docs](https://rr.brott.dev/docs/v1-0/tuning/).
+## Subsystems within transfer
 
+- Color Sensors (x3)
+- Indexer System
+- Transfer lifts (x3) (Servos)
+- StateMachine Code

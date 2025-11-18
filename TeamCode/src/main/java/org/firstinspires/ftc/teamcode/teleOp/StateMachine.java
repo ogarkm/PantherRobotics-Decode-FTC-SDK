@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.teleOp;
 
 import org.firstinspires.ftc.teamcode.Hware.hwMap;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
+import org.firstinspires.ftc.teamcode.subsystems.TransferSys;
 import org.firstinspires.ftc.teamcode.subsystems.GameState;
 import org.firstinspires.ftc.teamcode.subsystems.RobotState;
 
@@ -9,6 +10,7 @@ public class StateMachine {
     private RobotState currentRobotState = RobotState.INIT;
     private GameState currentGameState = GameState.IDLE;
     private final DriveTrain m_driveTrain;
+    private final TransferSys m_transfer;
     private final hwMap hardware;
     
     private boolean endgameTriggered = false;
@@ -17,6 +19,7 @@ public class StateMachine {
     public StateMachine(hwMap hardwareMap) {
         this.hardware = hardwareMap;
         this.m_driveTrain = new DriveTrain(hardware);
+        this.m_transfer = new TransferSys(hardware);
 
         setRobotState(RobotState.DISABLED);
         setGameState(GameState.IDLE);
@@ -42,10 +45,11 @@ public class StateMachine {
         // Clean up previous game state
         switch (oldState) {
             case INTAKING:
-                // Stop intake motors, etc.
+                m_transfer.setTransferState(TransferSys.TransferState.INDEXING);
                 break;
             case SCORING:
-                // Retract scoring mechanism, etc.
+                m_transfer.resetAllFlickers();
+                m_transfer.setTransferState(TransferSys.TransferState.IDLING);
                 break;
         }
     }
@@ -56,18 +60,21 @@ public class StateMachine {
             case INTAKING:
                 // Start intake motors, lower intake, etc.
                 m_driveTrain.setDriveState(DriveTrain.DriveState.NORMAL);
+                m_transfer.setTransferState(TransferSys.TransferState.IDLING);
                 break;
             case SCORING:
-                // Prepare scoring mechanism, precision drive
+                m_transfer.setTransferState(TransferSys.TransferState.FLICKING);
                 m_driveTrain.setDriveState(DriveTrain.DriveState.PRECISION);
                 break;
             case CLIMBING:
                 // Slow, careful movements for climbing
                 m_driveTrain.setDriveState(DriveTrain.DriveState.PRECISION);
+                m_transfer.setTransferState(TransferSys.TransferState.IDLING);
                 break;
             case DEFENDING:
                 // Aggressive drive mode
                 m_driveTrain.setDriveState(DriveTrain.DriveState.TURBO);
+                m_transfer.setTransferState(TransferSys.TransferState.IDLING);
                 break;
         }
     }
@@ -113,6 +120,7 @@ public class StateMachine {
                 break;
             case DISABLED:
                 m_driveTrain.setDriveState(DriveTrain.DriveState.STOP);
+                m_transfer.setTransferState(TransferSys.TransferState.STOP);
                 break;
             case ESTOP:
                 m_driveTrain.setDriveState(DriveTrain.DriveState.STOP);
@@ -148,6 +156,8 @@ public class StateMachine {
                 // Run intake logic, check if we have element, etc.
                 break;
             case SCORING:
+                m_transfer.flickAll();
+                //launch()
                 // Run scoring sequence, check alignment, etc.
                 break;
             case CLIMBING:
@@ -164,6 +174,10 @@ public class StateMachine {
 
     public DriveTrain getDriveTrain() {
         return m_driveTrain;
+    }
+
+    public TransferSys getTransferSystem() {
+        return m_transfer;
     }
 
     public RobotState getCurrentRobotState() {

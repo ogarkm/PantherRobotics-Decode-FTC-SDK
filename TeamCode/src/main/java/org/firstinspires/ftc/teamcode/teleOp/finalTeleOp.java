@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Hware.hwMap;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
+import org.firstinspires.ftc.teamcode.subsystems.GameState;
 import org.firstinspires.ftc.teamcode.subsystems.RobotState;
 
 @TeleOp(name="Meet1_Tele", group="FINAL")
@@ -39,11 +40,19 @@ public class finalTeleOp extends LinearOpMode {
                 stateMachine.emergencyStop();
             }
 
-            stateMachine.update();
+            hardware.checkFlickPos(); // TODO - MAKE SURE THIS GETS TRANSFERRED
+
+            if (gamepad1.a) {
+                stateMachine.setGameState(GameState.SCORING);
+            }
+            else {
+                stateMachine.setGameState(GameState.IDLE);
+            }
 
             // Telemetry
             telemetry.addData("Robot State", stateMachine.getCurrentRobotState());
             telemetry.addData("Drive State", stateMachine.getDriveTrain().getDriveState());
+            telemetry.addData("Transfer System", stateMachine.getTransferSystem().getTransferState());
             telemetry.update();
         }
 

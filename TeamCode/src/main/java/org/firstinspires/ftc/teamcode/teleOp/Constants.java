@@ -12,6 +12,17 @@ public class Constants {
         public static final String BACK_LEFT_MOTOR = "bl";
         public static final String BACK_RIGHT_MOTOR = "br";
 
+
+        public static final String LIFT_SERVO_A = "liftA";
+        public static final String LIFT_SERVO_B = "liftB";
+        public static final String LIFT_SERVO_C = "liftC";
+
+
+        public static final String INDEX_SENSOR_A = "indexSensorA";
+        public static final String INDEX_SENSOR_B = "indexSensorB";
+        public static final String INDEX_SENSOR_C = "indexSensorC";
+
+
         public static final DcMotorSimple.Direction FRONT_LEFT_DIRECTION = DcMotorSimple.Direction.REVERSE;
         public static final DcMotorSimple.Direction FRONT_RIGHT_DIRECTION = DcMotorSimple.Direction.FORWARD;
         public static final DcMotorSimple.Direction BACK_LEFT_DIRECTION = DcMotorSimple.Direction.REVERSE;
@@ -45,6 +56,12 @@ public class Constants {
         public static final double NORMAL_SPEED_MULTIPLIER = 1.0;
         public static final double PRECISION_SPEED_MULTIPLIER = 0.4;
         public static final double TURBO_SPEED_MULTIPLIER = 1.0;
+
+
+
+        // Lift Constants - TODO TUNE THESE PLS
+        public static final double FLICK_POS_UP = 160; // with POS 0 at the top, with cw rotation
+        public static final double FLICK_POS_DOWN = 30; // with POS 0 at the top, with cw rotation
     }
 
     // Controller Constants
