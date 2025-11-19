@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.teleOp;
 
-import org.firstinspires.ftc.teamcode.Hware.hwMap;
+import org.firstinspires.ftc.teamcode.Hware.hwMapExt;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.TransferSys;
 import org.firstinspires.ftc.teamcode.subsystems.GameState;
@@ -11,12 +11,12 @@ public class StateMachine {
     private GameState currentGameState = GameState.IDLE;
     private final DriveTrain m_driveTrain;
     private final TransferSys m_transfer;
-    private final hwMap hardware;
-    
+    private final hwMapExt hardware;
+
     private boolean endgameTriggered = false;
     private double matchTime = 0;
 
-    public StateMachine(hwMap hardwareMap) {
+    public StateMachine(hwMapExt hardwareMap) {
         this.hardware = hardwareMap;
         this.m_driveTrain = new DriveTrain(hardware);
         this.m_transfer = new TransferSys(hardware);
