@@ -13,9 +13,9 @@ public class Constants {
         public static final String BACK_RIGHT_MOTOR = "br";
 
 
-        public static final String LIFT_SERVO_A = "liftA";
-        public static final String LIFT_SERVO_B = "liftB";
-        public static final String LIFT_SERVO_C = "liftC";
+        public static final String LIFT_SERVO_A = "flickA";
+        public static final String LIFT_SERVO_B = "flickB";
+        public static final String LIFT_SERVO_C = "flickC";
 
 
         public static final String INDEX_SENSOR_A = "indexSensorA";

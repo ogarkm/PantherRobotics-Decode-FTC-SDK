@@ -21,9 +21,9 @@ public class hwMap {
     public DcMotor backRightMotor;
 
 
-    public Servo liftA;
-    public Servo liftB;
-    public Servo liftC;
+    public Servo flickA;
+    public Servo flickB;
+    public Servo flickC;
 
     public NormalizedColorSensor indexA;
     public NormalizedColorSensor indexB;
@@ -60,16 +60,16 @@ public class hwMap {
         setMotorModes(DriveConstants.MOTOR_RUNMODE);
 
         //transfer system start
-        liftA = hardwareMap.servo.get(DriveConstants.LIFT_SERVO_A);
-        liftB = hardwareMap.servo.get(DriveConstants.LIFT_SERVO_B);
-        liftC = hardwareMap.servo.get(DriveConstants.LIFT_SERVO_C);
+        flickA = hardwareMap.servo.get(DriveConstants.LIFT_SERVO_A);
+        flickB = hardwareMap.servo.get(DriveConstants.LIFT_SERVO_B);
+        flickC = hardwareMap.servo.get(DriveConstants.LIFT_SERVO_C);
 
         indexA = hardwareMap.get(NormalizedColorSensor.class, DriveConstants.INDEX_SENSOR_A);
         indexB = hardwareMap.get(NormalizedColorSensor.class, DriveConstants.INDEX_SENSOR_B);
         indexC = hardwareMap.get(NormalizedColorSensor.class, DriveConstants.INDEX_SENSOR_C);
 
         NormalizedColorSensor[] sensors = { indexA, indexB, indexC };
-        Servo[] lifts = { liftA, liftB, liftC };
+        Servo[] lifts = {flickA, flickB, flickC};
 
         for (NormalizedColorSensor sensor : sensors) {
             if (sensor instanceof SwitchableLight) {
