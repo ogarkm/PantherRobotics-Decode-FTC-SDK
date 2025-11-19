@@ -1,24 +1,25 @@
 package org.firstinspires.ftc.teamcode.teleOp;
 
-import org.firstinspires.ftc.teamcode.Hware.hwMap;
+import org.firstinspires.ftc.teamcode.Hware.hwMapExt;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.GameState;
 import org.firstinspires.ftc.teamcode.subsystems.RobotState;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
 
 public class StateMachine {
     private RobotState currentRobotState = RobotState.INIT;
     private GameState currentGameState = GameState.IDLE;
     private final DriveTrain m_driveTrain;
-    private final hwMap hardware;
-    
-    private boolean endgameTriggered = false;
-    private double matchTime = 0;
+    private final hwMapExt hardware;
+    private final Intake m_intake; 
 
-    public StateMachine(hwMap hardwareMap) {
+
+    public StateMachine(hwMapExt hardwareMap) {
         this.hardware = hardwareMap;
         this.m_driveTrain = new DriveTrain(hardware);
+        this.m_intake = new Intake(hardware);
 
-        setRobotState(RobotState.DISABLED);
+        setRobotState(RobotState.INIT);
         setGameState(GameState.IDLE);
     }
 
@@ -42,7 +43,7 @@ public class StateMachine {
         // Clean up previous game state
         switch (oldState) {
             case INTAKING:
-                // Stop intake motors, etc.
+                m_intake.setIntakeState(Intake.IntakeState.IDLE);
                 break;
             case SCORING:
                 // Retract scoring mechanism, etc.
@@ -56,46 +57,33 @@ public class StateMachine {
             case INTAKING:
                 // Start intake motors, lower intake, etc.
                 m_driveTrain.setDriveState(DriveTrain.DriveState.NORMAL);
+                m_intake.setIntakeState(Intake.IntakeState.INTAKE);
+                break;
+            case EXTAKING:
+                // Start intake motors, lower intake, etc.
+                m_driveTrain.setDriveState(DriveTrain.DriveState.NORMAL);
+                m_intake.setIntakeState(Intake.IntakeState.EXTAKE);
                 break;
             case SCORING:
                 // Prepare scoring mechanism, precision drive
                 m_driveTrain.setDriveState(DriveTrain.DriveState.PRECISION);
+                m_intake.setIntakeState(Intake.IntakeState.IDLE);
                 break;
-            case CLIMBING:
+            case LIFTING:
                 // Slow, careful movements for climbing
-                m_driveTrain.setDriveState(DriveTrain.DriveState.PRECISION);
+                m_driveTrain.setDriveState(DriveTrain.DriveState.STOP);
+                m_intake.setIntakeState(Intake.IntakeState.IDLE);
                 break;
-            case DEFENDING:
+            case IDLE:
                 // Aggressive drive mode
-                m_driveTrain.setDriveState(DriveTrain.DriveState.TURBO);
+                m_driveTrain.setDriveState(DriveTrain.DriveState.STOP);
+                m_intake.setIntakeState(Intake.IntakeState.IDLE);
                 break;
         }
     }
-
-    public void checkRobotStateTransitions(double matchTime) {
-        this.matchTime = matchTime;
-        switch (currentRobotState) {
-            case TELEOP:
-                // Teleop-specific updates if needed
-                break;
-            case AUTONOMOUS:
-                // Autonomous-specific updates if needed
-                break;
-            case DISABLED:
-                // Disabled-specific updates if needed
-                break;
-            case ESTOP:
-                // E-stop handling
-                break;
-        }
-    }
-
     private void handleRobotStateExit(RobotState oldState) {
         switch (oldState) {
             case TELEOP:
-                m_driveTrain.stop();
-                break;
-            case AUTONOMOUS:
                 m_driveTrain.stop();
                 break;
             case ESTOP:
@@ -107,38 +95,12 @@ public class StateMachine {
         switch (newState) {
             case TELEOP:
                 m_driveTrain.setDriveState(DriveTrain.DriveState.NORMAL);
-                break;
-            case AUTONOMOUS:
-                m_driveTrain.setDriveState(DriveTrain.DriveState.NORMAL);
-                break;
-            case DISABLED:
-                m_driveTrain.setDriveState(DriveTrain.DriveState.STOP);
+                m_intake.setIntakeState(Intake.IntakeState.IDLE);
                 break;
             case ESTOP:
                 m_driveTrain.setDriveState(DriveTrain.DriveState.STOP);
+                m_intake.setIntakeState(Intake.IntakeState.STOP);
                 break;
-        }
-    }
-
-    public void update(double matchTime) {
-        this.matchTime = matchTime;
-
-        checkRobotStateTransitions();
-        checkGameStateTransitions();
-        handleStatePeriodic();
-    }
-
-    private void checkRobotStateTransitions() {
-        if (currentRobotState == RobotState.TELEOP && matchTime <= 30 && !endgameTriggered) {
-            setRobotState(RobotState.ENDGAME);
-            endgameTriggered = true;
-        }
-    }
-
-    private void checkGameStateTransitions() {
-        // Game logic
-        if (currentRobotState == RobotState.TELEOP || currentRobotState == RobotState.ENDGAME) {
-            // game-specific transition logic
         }
     }
 
@@ -150,7 +112,7 @@ public class StateMachine {
             case SCORING:
                 // Run scoring sequence, check alignment, etc.
                 break;
-            case CLIMBING:
+            case LIFTING:
                 // Climbing sequence, check hooks, etc.
                 break;
         }
@@ -165,14 +127,15 @@ public class StateMachine {
     public DriveTrain getDriveTrain() {
         return m_driveTrain;
     }
-
+    public Intake getIntake() {                            
+        return m_intake;
+    }
     public RobotState getCurrentRobotState() {
         return currentRobotState;
     }
 
-    public GameState getGameState() { return currentGameState; }
 
-    public hwMap getHardware() {
+    public hwMapExt getHardware() {
         return hardware;
     }
 

@@ -3,18 +3,19 @@ package org.firstinspires.ftc.teamcode.teleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Hware.hwMap;
+import org.firstinspires.ftc.teamcode.Hware.hwMapExt;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.RobotState;
+import org.firstinspires.ftc.teamcode.subsystems.GameState;
 
-@TeleOp(name="Meet1_Tele", group="FINAL")
+@TeleOp(name="FinalTeleOp", group="FINAL")
 public class finalTeleOp extends LinearOpMode {
 
     private StateMachine stateMachine;
 
     @Override
     public void runOpMode() throws InterruptedException {
-        hwMap hardware = new hwMap(hardwareMap);
+        hwMapExt hardware = new hwMapExt(hardwareMap);
         stateMachine = new StateMachine(hardware);
 
         waitForStart();
@@ -34,12 +35,20 @@ public class finalTeleOp extends LinearOpMode {
             } else {
                 stateMachine.getDriveTrain().setDriveState(DriveTrain.DriveState.NORMAL);
             }
+            // --- intake control (both intakes together) ---
+            if (gamepad1.right_bumper) {
+                stateMachine.setGameState(GameState.INTAKING);
+            } else if (gamepad1.left_bumper) {
+                // intake out
+                stateMachine.setGameState(GameState.EXTAKING);
+            } else {
+                // no buttons -> stop intake
+                stateMachine.setGameState(GameState.IDLE);
+            }
 
             if (gamepad1.back) {
                 stateMachine.emergencyStop();
             }
-
-            stateMachine.update();
 
             // Telemetry
             telemetry.addData("Robot State", stateMachine.getCurrentRobotState());
@@ -47,6 +56,6 @@ public class finalTeleOp extends LinearOpMode {
             telemetry.update();
         }
 
-        stateMachine.setRobotState(RobotState.DISABLED);
+        stateMachine.setRobotState(RobotState.ESTOP);
     }
 }

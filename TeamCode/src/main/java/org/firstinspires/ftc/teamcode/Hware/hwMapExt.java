@@ -4,11 +4,17 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.teleOp.Constants;
+
 public class hwMapExt {
     public DcMotor frontLeftMotor;
     public DcMotor backLeftMotor;
     public DcMotor frontRightMotor;
     public DcMotor backRightMotor;
+
+
+    public DcMotor frontIntakeMotor;
+    public DcMotor backIntakeMotor;
 
     public hwMapExt(HardwareMap hardwareMap) {
         frontLeftMotor = hardwareMap.dcMotor.get("fl");
@@ -27,6 +33,19 @@ public class hwMapExt {
         backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         setMotorModes(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+
+        frontIntakeMotor = hardwareMap.dcMotor.get(Constants.IntakeConstants.FRONT_INTAKE_MOTOR);
+        backIntakeMotor = hardwareMap.dcMotor.get(Constants.IntakeConstants.BACK_INTAKE_MOTOR);
+
+        frontIntakeMotor.setDirection(Constants.IntakeConstants.FRONT_INTAKE_DIRECTION);
+        backIntakeMotor.setDirection(Constants.IntakeConstants.BACK_INTAKE_DIRECTION);
+
+        frontIntakeMotor.setZeroPowerBehavior(Constants.IntakeConstants.INTAKE_ZERO_POWER_BEHAVIOR);
+        backIntakeMotor.setZeroPowerBehavior(Constants.IntakeConstants.INTAKE_ZERO_POWER_BEHAVIOR);
+
+        frontIntakeMotor.setMode(Constants.IntakeConstants.INTAKE_RUNMODE);
+        backIntakeMotor.setMode(Constants.IntakeConstants.INTAKE_RUNMODE);
     }
 
     public void setMotorModes(DcMotor.RunMode mode) {

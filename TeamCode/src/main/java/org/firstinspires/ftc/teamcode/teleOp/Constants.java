@@ -12,6 +12,7 @@ public class Constants {
         public static final String BACK_LEFT_MOTOR = "bl";
         public static final String BACK_RIGHT_MOTOR = "br";
 
+
         public static final DcMotorSimple.Direction FRONT_LEFT_DIRECTION = DcMotorSimple.Direction.REVERSE;
         public static final DcMotorSimple.Direction FRONT_RIGHT_DIRECTION = DcMotorSimple.Direction.FORWARD;
         public static final DcMotorSimple.Direction BACK_LEFT_DIRECTION = DcMotorSimple.Direction.REVERSE;
@@ -45,6 +46,21 @@ public class Constants {
         public static final double NORMAL_SPEED_MULTIPLIER = 1.0;
         public static final double PRECISION_SPEED_MULTIPLIER = 0.4;
         public static final double TURBO_SPEED_MULTIPLIER = 1.0;
+    }
+
+    public static class IntakeConstants {
+        public static final String FRONT_INTAKE_MOTOR = "frontIntake";
+        public static final String BACK_INTAKE_MOTOR = "backIntake";
+
+        public static final DcMotorSimple.Direction FRONT_INTAKE_DIRECTION = DcMotorSimple.Direction.FORWARD;
+        public static final DcMotorSimple.Direction BACK_INTAKE_DIRECTION = DcMotorSimple.Direction.FORWARD;
+
+        public static DcMotor.ZeroPowerBehavior INTAKE_ZERO_POWER_BEHAVIOR = DcMotor.ZeroPowerBehavior.BRAKE;
+        public static DcMotor.RunMode INTAKE_RUNMODE = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
+
+        public static final double INTAKE_POWER = 1.0;
+        public static final double EXTAKE_POWER = -1.0;
+        public static final double IDLE_POWER = 0;
     }
 
     // Controller Constants
