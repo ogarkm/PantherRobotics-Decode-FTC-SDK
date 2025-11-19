@@ -114,7 +114,7 @@ public class hwMap {
 
     public void resetEncoders() {
         setMotorModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        setMotorModes(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        setMotorModes(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public int[] getEncoderPositions() {
@@ -125,7 +125,6 @@ public class hwMap {
                 backRightMotor.getCurrentPosition()
         };
     }
-
 
 
 

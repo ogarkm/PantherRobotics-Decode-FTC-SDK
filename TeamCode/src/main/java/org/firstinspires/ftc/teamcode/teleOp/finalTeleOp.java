@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.GameState;
 import org.firstinspires.ftc.teamcode.subsystems.RobotState;
 
-@TeleOp(name="Meet1_Tele", group="FINAL")
+@TeleOp(name="TeleOp", group="FINAL")
 public class finalTeleOp extends LinearOpMode {
 
     private StateMachine stateMachine;
