@@ -4,11 +4,17 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.teleOp.Constants;
+
 public class hwMapExt {
     public DcMotor frontLeftMotor;
     public DcMotor backLeftMotor;
     public DcMotor frontRightMotor;
     public DcMotor backRightMotor;
+
+
+    public DcMotor frontIntakeMotor;
+    public DcMotor backIntakeMotor;
 
     public hwMapExt(HardwareMap hardwareMap) {
         frontLeftMotor = hardwareMap.dcMotor.get("fl");
@@ -27,6 +33,10 @@ public class hwMapExt {
         backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         setMotorModes(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+
+        frontIntakeMotor = hardwareMap.dcMotor.get(Constants.IntakeConstants.FRONT_INTAKE_MOTOR);
+        backIntakeMotor = hardwareMap.dcMotor.get(Constants.IntakeConstants.BACK_INTAKE_MOTOR);
     }
 
     public void setMotorModes(DcMotor.RunMode mode) {
