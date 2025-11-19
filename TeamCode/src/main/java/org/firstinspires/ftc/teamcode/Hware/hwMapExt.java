@@ -37,6 +37,15 @@ public class hwMapExt {
 
         frontIntakeMotor = hardwareMap.dcMotor.get(Constants.IntakeConstants.FRONT_INTAKE_MOTOR);
         backIntakeMotor = hardwareMap.dcMotor.get(Constants.IntakeConstants.BACK_INTAKE_MOTOR);
+
+        frontIntakeMotor.setDirection(Constants.IntakeConstants.FRONT_INTAKE_DIRECTION);
+        backIntakeMotor.setDirection(Constants.IntakeConstants.BACK_INTAKE_DIRECTION);
+
+        frontIntakeMotor.setZeroPowerBehavior(Constants.IntakeConstants.INTAKE_ZERO_POWER_BEHAVIOR);
+        backIntakeMotor.setZeroPowerBehavior(Constants.IntakeConstants.INTAKE_ZERO_POWER_BEHAVIOR);
+
+        frontIntakeMotor.setMode(Constants.IntakeConstants.INTAKE_RUNMODE);
+        backIntakeMotor.setMode(Constants.IntakeConstants.INTAKE_RUNMODE);
     }
 
     public void setMotorModes(DcMotor.RunMode mode) {
