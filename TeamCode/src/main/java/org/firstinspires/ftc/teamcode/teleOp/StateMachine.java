@@ -10,6 +10,7 @@ public class StateMachine {
     private GameState currentGameState = GameState.IDLE;
     private final DriveTrain m_driveTrain;
     private final hwMap hardware;
+    private final Intake m_intake; 
     
     private boolean endgameTriggered = false;
     private double matchTime = 0;
@@ -17,6 +18,7 @@ public class StateMachine {
     public StateMachine(hwMap hardwareMap) {
         this.hardware = hardwareMap;
         this.m_driveTrain = new DriveTrain(hardware);
+        this.m_intake = new Intake(hardware.hwMap);      
 
         setRobotState(RobotState.DISABLED);
         setGameState(GameState.IDLE);
@@ -42,7 +44,7 @@ public class StateMachine {
         // Clean up previous game state
         switch (oldState) {
             case INTAKING:
-                // Stop intake motors, etc.
+                m_intake.stop();// Stop intake motors, etc.
                 break;
             case SCORING:
                 // Retract scoring mechanism, etc.
@@ -56,18 +58,23 @@ public class StateMachine {
             case INTAKING:
                 // Start intake motors, lower intake, etc.
                 m_driveTrain.setDriveState(DriveTrain.DriveState.NORMAL);
+                m_intake.setPower(0.85);                    
+                m_intake.in();   
                 break;
             case SCORING:
                 // Prepare scoring mechanism, precision drive
                 m_driveTrain.setDriveState(DriveTrain.DriveState.PRECISION);
+                m_intake.stop(); 
                 break;
             case CLIMBING:
                 // Slow, careful movements for climbing
                 m_driveTrain.setDriveState(DriveTrain.DriveState.PRECISION);
+                m_intake.stop();  
                 break;
             case DEFENDING:
                 // Aggressive drive mode
                 m_driveTrain.setDriveState(DriveTrain.DriveState.TURBO);
+                m_intake.stop();  
                 break;
         }
     }
@@ -160,12 +167,15 @@ public class StateMachine {
     public void emergencyStop() {
         setRobotState(RobotState.ESTOP);
         setGameState(GameState.IDLE);
+        m_intake.stop();  
     }
 
     public DriveTrain getDriveTrain() {
         return m_driveTrain;
     }
-
+    public Intake getIntake() {                            
+        return m_intake;
+    }
     public RobotState getCurrentRobotState() {
         return currentRobotState;
     }

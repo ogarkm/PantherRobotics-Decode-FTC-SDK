@@ -34,6 +34,20 @@ public class finalTeleOp extends LinearOpMode {
             } else {
                 stateMachine.getDriveTrain().setDriveState(DriveTrain.DriveState.NORMAL);
             }
+            // --- intake control (both intakes together) ---
+            if (gamepad1.right_bumper) {
+                // intake in
+                stateMachine.getIntake().in();
+                stateMachine.setGameState(GameState.INTAKING);
+            } else if (gamepad1.left_bumper) {
+                // intake out
+                stateMachine.getIntake().out();
+                stateMachine.setGameState(GameState.INTAKING);
+            } else {
+                // no buttons -> stop intake
+                stateMachine.getIntake().stop();
+                stateMachine.setGameState(GameState.IDLE);
+            }
 
             if (gamepad1.back) {
                 stateMachine.emergencyStop();
