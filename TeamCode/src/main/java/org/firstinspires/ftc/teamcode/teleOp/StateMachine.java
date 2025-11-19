@@ -12,16 +12,14 @@ public class StateMachine {
     private final DriveTrain m_driveTrain;
     private final hwMapExt hardware;
     private final Intake m_intake; 
-    
-    private boolean endgameTriggered = false;
-    private double matchTime = 0;
+
 
     public StateMachine(hwMapExt hardwareMap) {
         this.hardware = hardwareMap;
         this.m_driveTrain = new DriveTrain(hardware);
         this.m_intake = new Intake(hardware);
 
-        setRobotState(RobotState.DISABLED);
+        setRobotState(RobotState.INIT);
         setGameState(GameState.IDLE);
     }
 
@@ -71,43 +69,21 @@ public class StateMachine {
                 m_driveTrain.setDriveState(DriveTrain.DriveState.PRECISION);
                 m_intake.setIntakeState(Intake.IntakeState.IDLE);
                 break;
-            case CLIMBING:
+            case LIFTING:
                 // Slow, careful movements for climbing
-                m_driveTrain.setDriveState(DriveTrain.DriveState.PRECISION);
+                m_driveTrain.setDriveState(DriveTrain.DriveState.STOP);
                 m_intake.setIntakeState(Intake.IntakeState.IDLE);
                 break;
-            case DEFENDING:
+            case IDLE:
                 // Aggressive drive mode
-                m_driveTrain.setDriveState(DriveTrain.DriveState.TURBO);
+                m_driveTrain.setDriveState(DriveTrain.DriveState.STOP);
                 m_intake.setIntakeState(Intake.IntakeState.IDLE);
                 break;
         }
     }
-
-    public void checkRobotStateTransitions(double matchTime) {
-        this.matchTime = matchTime;
-        switch (currentRobotState) {
-            case TELEOP:
-                // Teleop-specific updates if needed
-                break;
-            case AUTONOMOUS:
-                // Autonomous-specific updates if needed
-                break;
-            case DISABLED:
-                // Disabled-specific updates if needed
-                break;
-            case ESTOP:
-                // E-stop handling
-                break;
-        }
-    }
-
     private void handleRobotStateExit(RobotState oldState) {
         switch (oldState) {
             case TELEOP:
-                m_driveTrain.stop();
-                break;
-            case AUTONOMOUS:
                 m_driveTrain.stop();
                 break;
             case ESTOP:
@@ -121,35 +97,10 @@ public class StateMachine {
                 m_driveTrain.setDriveState(DriveTrain.DriveState.NORMAL);
                 m_intake.setIntakeState(Intake.IntakeState.IDLE);
                 break;
-            case DISABLED:
-                m_driveTrain.setDriveState(DriveTrain.DriveState.STOP);
-                break;
             case ESTOP:
                 m_driveTrain.setDriveState(DriveTrain.DriveState.STOP);
                 m_intake.setIntakeState(Intake.IntakeState.STOP);
                 break;
-        }
-    }
-
-    public void update(double matchTime) {
-        this.matchTime = matchTime;
-
-        checkRobotStateTransitions();
-        checkGameStateTransitions();
-        handleStatePeriodic();
-    }
-
-    private void checkRobotStateTransitions() {
-        if (currentRobotState == RobotState.TELEOP && matchTime <= 30 && !endgameTriggered) {
-            setRobotState(RobotState.ENDGAME);
-            endgameTriggered = true;
-        }
-    }
-
-    private void checkGameStateTransitions() {
-        // Game logic
-        if (currentRobotState == RobotState.TELEOP || currentRobotState == RobotState.ENDGAME) {
-            // game-specific transition logic
         }
     }
 
@@ -161,7 +112,7 @@ public class StateMachine {
             case SCORING:
                 // Run scoring sequence, check alignment, etc.
                 break;
-            case CLIMBING:
+            case LIFTING:
                 // Climbing sequence, check hooks, etc.
                 break;
         }
@@ -183,7 +134,6 @@ public class StateMachine {
         return currentRobotState;
     }
 
-    public GameState getGameState() { return currentGameState; }
 
     public hwMapExt getHardware() {
         return hardware;

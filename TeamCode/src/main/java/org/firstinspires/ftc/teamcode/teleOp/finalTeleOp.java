@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.RobotState;
 import org.firstinspires.ftc.teamcode.subsystems.GameState;
 
-@TeleOp(name="Meet1_Tele", group="FINAL")
+@TeleOp(name="FinalTeleOp", group="FINAL")
 public class finalTeleOp extends LinearOpMode {
 
     private StateMachine stateMachine;
@@ -50,14 +50,12 @@ public class finalTeleOp extends LinearOpMode {
                 stateMachine.emergencyStop();
             }
 
-            stateMachine.update();
-
             // Telemetry
             telemetry.addData("Robot State", stateMachine.getCurrentRobotState());
             telemetry.addData("Drive State", stateMachine.getDriveTrain().getDriveState());
             telemetry.update();
         }
 
-        stateMachine.setRobotState(RobotState.DISABLED);
+        stateMachine.setRobotState(RobotState.ESTOP);
     }
 }
