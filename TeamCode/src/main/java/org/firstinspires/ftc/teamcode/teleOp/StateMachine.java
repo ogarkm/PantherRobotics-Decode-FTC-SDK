@@ -45,7 +45,7 @@ public class StateMachine {
         // Clean up previous game state
         switch (oldState) {
             case INTAKING:
-                m_intake.stop();// Stop intake motors, etc.
+                m_intake.setIntakeState(Intake.IntakeState.IDLE);
                 break;
             case SCORING:
                 // Retract scoring mechanism, etc.
@@ -59,23 +59,27 @@ public class StateMachine {
             case INTAKING:
                 // Start intake motors, lower intake, etc.
                 m_driveTrain.setDriveState(DriveTrain.DriveState.NORMAL);
-                m_intake.setPower(0.85);                    
-                m_intake.in();   
+                m_intake.setIntakeState(Intake.IntakeState.INTAKE);
+                break;
+            case EXTAKING:
+                // Start intake motors, lower intake, etc.
+                m_driveTrain.setDriveState(DriveTrain.DriveState.NORMAL);
+                m_intake.setIntakeState(Intake.IntakeState.EXTAKE);
                 break;
             case SCORING:
                 // Prepare scoring mechanism, precision drive
                 m_driveTrain.setDriveState(DriveTrain.DriveState.PRECISION);
-                m_intake.stop(); 
+                m_intake.setIntakeState(Intake.IntakeState.IDLE);
                 break;
             case CLIMBING:
                 // Slow, careful movements for climbing
                 m_driveTrain.setDriveState(DriveTrain.DriveState.PRECISION);
-                m_intake.stop();  
+                m_intake.setIntakeState(Intake.IntakeState.IDLE);
                 break;
             case DEFENDING:
                 // Aggressive drive mode
                 m_driveTrain.setDriveState(DriveTrain.DriveState.TURBO);
-                m_intake.stop();  
+                m_intake.setIntakeState(Intake.IntakeState.IDLE);
                 break;
         }
     }
@@ -115,15 +119,14 @@ public class StateMachine {
         switch (newState) {
             case TELEOP:
                 m_driveTrain.setDriveState(DriveTrain.DriveState.NORMAL);
-                break;
-            case AUTONOMOUS:
-                m_driveTrain.setDriveState(DriveTrain.DriveState.NORMAL);
+                m_intake.setIntakeState(Intake.IntakeState.IDLE);
                 break;
             case DISABLED:
                 m_driveTrain.setDriveState(DriveTrain.DriveState.STOP);
                 break;
             case ESTOP:
                 m_driveTrain.setDriveState(DriveTrain.DriveState.STOP);
+                m_intake.setIntakeState(Intake.IntakeState.STOP);
                 break;
         }
     }
@@ -168,7 +171,6 @@ public class StateMachine {
     public void emergencyStop() {
         setRobotState(RobotState.ESTOP);
         setGameState(GameState.IDLE);
-        m_intake.stop();  
     }
 
     public DriveTrain getDriveTrain() {
@@ -183,7 +185,7 @@ public class StateMachine {
 
     public GameState getGameState() { return currentGameState; }
 
-    public hwMap getHardware() {
+    public hwMapExt getHardware() {
         return hardware;
     }
 
