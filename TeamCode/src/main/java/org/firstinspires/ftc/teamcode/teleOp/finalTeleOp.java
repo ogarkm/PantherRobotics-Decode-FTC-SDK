@@ -3,9 +3,10 @@ package org.firstinspires.ftc.teamcode.teleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Hware.hwMap;
+import org.firstinspires.ftc.teamcode.Hware.hwMapExt;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.RobotState;
+import org.firstinspires.ftc.teamcode.subsystems.GameState;
 
 @TeleOp(name="Meet1_Tele", group="FINAL")
 public class finalTeleOp extends LinearOpMode {
@@ -14,7 +15,7 @@ public class finalTeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        hwMap hardware = new hwMap(hardwareMap);
+        hwMapExt hardware = new hwMapExt(hardwareMap);
         stateMachine = new StateMachine(hardware);
 
         waitForStart();

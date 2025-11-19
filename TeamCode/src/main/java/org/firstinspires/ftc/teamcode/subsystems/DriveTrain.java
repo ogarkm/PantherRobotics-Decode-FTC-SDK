@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
-import org.firstinspires.ftc.teamcode.Hware.hwMap;
+import org.firstinspires.ftc.teamcode.Hware.hwMapExt;
 public class DriveTrain {
-    private final hwMap hardware;
+    private final hwMapExt hardware;
     public enum DriveState {
         NORMAL,
         TURBO,
@@ -12,7 +12,7 @@ public class DriveTrain {
     private DriveState currentState = DriveState.NORMAL;
     private double maxSpeed = 1.0;
 
-    public DriveTrain(hwMap hardware) {
+    public DriveTrain(hwMapExt hardware) {
         this.hardware = hardware;
     }
 

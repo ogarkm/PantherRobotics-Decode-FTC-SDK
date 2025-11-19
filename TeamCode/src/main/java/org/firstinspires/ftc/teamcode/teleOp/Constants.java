@@ -57,6 +57,10 @@ public class Constants {
 
         public static DcMotor.ZeroPowerBehavior INTAKE_ZERO_POWER_BEHAVIOR = DcMotor.ZeroPowerBehavior.BRAKE;
         public static DcMotor.RunMode INTAKE_RUNMODE = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
+
+        public static final double INTAKE_POWER = 1.0;
+        public static final double EXTAKE_POWER = -1.0;
+        public static final double IDLE_POWER = 0;
     }
 
     // Controller Constants
