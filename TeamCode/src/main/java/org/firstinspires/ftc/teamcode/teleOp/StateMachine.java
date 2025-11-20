@@ -5,19 +5,23 @@ import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.GameState;
 import org.firstinspires.ftc.teamcode.subsystems.RobotState;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.Lift;
+
 
 public class StateMachine {
     private RobotState currentRobotState = RobotState.INIT;
     private GameState currentGameState = GameState.IDLE;
     private final DriveTrain m_driveTrain;
     private final hwMapExt hardware;
-    private final Intake m_intake; 
+    private final Intake m_intake;
+    private final Lift m_lift;
 
 
     public StateMachine(hwMapExt hardwareMap) {
         this.hardware = hardwareMap;
         this.m_driveTrain = new DriveTrain(hardware);
         this.m_intake = new Intake(hardware);
+        this.m_lift = new Lift(hardware);
 
         setRobotState(RobotState.INIT);
         setGameState(GameState.IDLE);

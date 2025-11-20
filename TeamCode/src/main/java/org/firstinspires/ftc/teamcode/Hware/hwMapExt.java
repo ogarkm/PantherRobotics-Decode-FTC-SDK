@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Hware;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.teleOp.Constants;
 
@@ -16,11 +17,21 @@ public class hwMapExt {
     public DcMotor frontIntakeMotor;
     public DcMotor backIntakeMotor;
 
+    //looking at it from the back (front is facing the front)
+    public Servo ptoLeft;
+    public Servo ptoRight;
+
     public hwMapExt(HardwareMap hardwareMap) {
         frontLeftMotor = hardwareMap.dcMotor.get("fl");
         backLeftMotor = hardwareMap.dcMotor.get("bl");
         frontRightMotor = hardwareMap.dcMotor.get("fr");
         backRightMotor = hardwareMap.dcMotor.get("br");
+
+        ptoLeft = hardwareMap.servo.get(Constants.LiftConstants.PTO_LEFT);
+        ptoRight = hardwareMap.servo.get(Constants.LiftConstants.PTO_RIGHT);
+
+        ptoRight.setDirection(Constants.LiftConstants.CW);
+        ptoLeft.setDirection(Constants.LiftConstants.CCW);
 
         frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -46,8 +57,31 @@ public class hwMapExt {
 
         frontIntakeMotor.setMode(Constants.IntakeConstants.INTAKE_RUNMODE);
         backIntakeMotor.setMode(Constants.IntakeConstants.INTAKE_RUNMODE);
+
+    }
+    private int inchesToTicks(double inches) {
+        double wheelDiameter = Constants.DriveConstants.WHEEL_DIAMETER;  // in inches
+        double ticksPerRev = Constants.DriveConstants.TICKS_PER_REVOLUTION;
+        double gearRatio = 2.0;
+        double circumference = Math.PI * wheelDiameter;
+
+        return (int) (inches * (ticksPerRev * gearRatio) / circumference);
     }
 
+    public void setServoPosition(double position){
+        ptoLeft.setPosition(position);
+        ptoRight.setPosition(position);
+    }
+
+    public void setMotorTargetPositions(double inches){
+        setMotorModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setMotorModes(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontLeftMotor.setTargetPosition(-inchesToTicks(inches));
+        frontRightMotor.setTargetPosition(inchesToTicks(inches));
+        backLeftMotor.setTargetPosition(-inchesToTicks(inches));
+        backRightMotor.setTargetPosition(inchesToTicks(inches));
+
+    }
     public void setMotorModes(DcMotor.RunMode mode) {
         frontLeftMotor.setMode(mode);
         backLeftMotor.setMode(mode);
@@ -61,6 +95,13 @@ public class hwMapExt {
         frontRightMotor.setPower(frontRightPower);
         backLeftMotor.setPower(backLeftPower);
         backRightMotor.setPower(backRightPower);
+    }
+
+    public void setMotorZeroPowerBehavior(DcMotor.ZeroPowerBehavior mode) {
+        frontLeftMotor.setZeroPowerBehavior(mode);
+        backLeftMotor.setZeroPowerBehavior(mode);
+        frontRightMotor.setZeroPowerBehavior(mode);
+        backRightMotor.setZeroPowerBehavior(mode);
     }
 
     public void stopMotors() {
