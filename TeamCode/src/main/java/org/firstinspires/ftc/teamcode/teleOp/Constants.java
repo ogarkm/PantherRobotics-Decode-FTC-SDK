@@ -54,6 +54,8 @@ public class Constants {
 
         public static final double MANUAL_TURRET_SPEED_DEG = 1.0;
 
+        public static final double TURRET_POWER = 1.0;
+
         public static final double SERVO_TO_TURRET_GEAR_RATIO = 3.5;
         public static final double TURRET_HOME_ANGLE = 0.0; // Home pos in deg (forward)
 
@@ -70,6 +72,9 @@ public class Constants {
         public static final String TURRET_RIGHT_MOTOR = "rturret";
         public static final String TURRET_LEFT_MOTOR = "lturret";
 
+        public static final double kP = 0.02;
+        public static final double kI = 0.00005;
+        public static final double kD = 0.0015;
         public static final DcMotorSimple.Direction TURRET_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
 
     }

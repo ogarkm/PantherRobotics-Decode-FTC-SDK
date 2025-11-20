@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.teamcode.Hware.hwMapExt;
 import org.firstinspires.ftc.teamcode.teleOp.Constants;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -13,7 +14,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 public class Turret {
 
     private final hwMapExt hardware;
-    private double turretPower = 1.0;
+    private double turretPower = Constants.TurretConstants.TURRET_POWER;
     private int alliance; // Used for Tracking
 
     private int[] apriltags = {20, 24};
@@ -21,9 +22,9 @@ public class Turret {
     private double turretAngle = Constants.TurretConstants.TURRET_HOME_ANGLE;
 
 
-    private double kP = 0.02;
-    private double kI = 0.00005;
-    private double kD = 0.0015;
+    private double kP = Constants.TurretConstants.kP;
+    private double kI = Constants.TurretConstants.kI;
+    private double kD = Constants.TurretConstants.kD;
 
     private double integral = 0;
     private double lastError = 0;
@@ -71,7 +72,6 @@ public class Turret {
 
     private void resetTurret() {
         hardware.initAprilTag();
-
     }
 
     public void autoLockLogic() {
@@ -88,22 +88,20 @@ public class Turret {
             lostTimer.reset();
 
             double rawYaw = apriltag.ftcPose.yaw;
-            double yawDeg = (Math.abs(rawYaw) <= (2 * Math.PI)) ?
-                    Math.toDegrees(rawYaw) : rawYaw;
+            double yawDeg = Math.toDegrees(rawYaw);
 
             double error = yawDeg;
             integral += error * dt;
             integral = Range.clip(integral, -100, 100);
 
             double derivative = (error - lastError) / dt;
+            derivative = Range.clip(derivative, -200, 200);
 
             double output = (kP * error) + (kI * integral) + (kD * derivative);
 
             if (Math.abs(error) < POSITION_TOLERANCE) {
                 output = 0;
                 integral = 0;
-            } else if (Math.abs(output) < MIN_OUTPUT) {
-                output = MIN_OUTPUT * Math.signum(output);
             }
 
             double appliedDeg = Range.clip(output, -MAX_OUTPUT, MAX_OUTPUT);
