@@ -12,6 +12,7 @@ public class Constants {
         public static final String BACK_LEFT_MOTOR = "bl";
         public static final String BACK_RIGHT_MOTOR = "br";
 
+
         public static final DcMotorSimple.Direction FRONT_LEFT_DIRECTION = DcMotorSimple.Direction.REVERSE;
         public static final DcMotorSimple.Direction FRONT_RIGHT_DIRECTION = DcMotorSimple.Direction.FORWARD;
         public static final DcMotorSimple.Direction BACK_LEFT_DIRECTION = DcMotorSimple.Direction.REVERSE;
@@ -47,23 +48,29 @@ public class Constants {
         public static final double TURBO_SPEED_MULTIPLIER = 1.0;
     }
 
-    // Controller Constants
-//    public static class ControllerConstants {
-//        // Controller deadzones
-//        public static final double LEFT_STICK_DEADZONE = 0.1;
-//        public static final double RIGHT_STICK_DEADZONE = 0.1;
-//        public static final double TRIGGER_DEADZONE = 0.1;
-//
-//        // Button mappings - Gamepad1 (Driver)
-//        public static final int PRECISION_MODE_BUTTON = gamepad1.right_trigger;
-//        public static final int TURBO_MODE_BUTTON = gamepad1.left_trigger;
-//        public static final int FIELD_CENTRIC_TOGGLE_BUTTON = gamepad1.x;
-//        public static final int RESET_IMU_BUTTON = gamepad1.y;
-//
-//        // Button mappings - Gamepad2 (Operator)
-//        public static final int INTAKE_BUTTON = gamepad2.a;
-//        public static final int OUTTAKE_BUTTON = gamepad2.b;
-//        public static final int LIFT_UP_BUTTON = gamepad2.dpad_up;
-//        public static final int LIFT_DOWN_BUTTON = gamepad2.dpad_down;
-//    }
+    public static class TurretConstants {
+        public static final double SERVO_MIN = 0.0;
+        public static final double SERVO_MAX = 1.0;
+
+        public static final double MANUAL_TURRET_SPEED_DEG = 1.0;
+
+        public static final double SERVO_TO_TURRET_GEAR_RATIO = 3.5;
+        public static final double TURRET_HOME_ANGLE = 0.0; // Home pos in deg (forward)
+
+        public static final double TURN_GAIN = 0.02;
+
+        public static final double EXTAKE_POWER = 0.3;
+
+
+        public static final String LEFT_TURRET_SERVO = "turretservo";
+
+        public static final String HOOD_TURRET_SERVO = "hoodservo";
+
+
+        public static final String TURRET_RIGHT_MOTOR = "rturret";
+        public static final String TURRET_LEFT_MOTOR = "lturret";
+
+        public static final DcMotorSimple.Direction TURRET_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
+
+    }
 }

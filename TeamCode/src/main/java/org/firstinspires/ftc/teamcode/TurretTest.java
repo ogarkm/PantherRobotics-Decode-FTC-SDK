@@ -1,22 +1,11 @@
-
-// #---------------------------#
-//  Basic TeleOP with Turret Control (Should be Automatic tho)
-//
-//  FTC Team 12926 - Panther Robotics
-//  Aarush Karnik
-//
-//  Adapted TeleOP from Game Manual 0
-//  https://gm0.org
-//  IDK if this actually works
-// #---------------------------#
-
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
@@ -27,57 +16,113 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
 
-@TeleOp(name="Turret_Test", group="TeleOp")
+/*
+  Note: image (for reference): file:///mnt/data/cd91aa82-78b2-4889-bd3b-5570186a905a.png
+*/
+
+@TeleOp(name="Turret Subsystem TeleOP (PID Auto)", group="TeleOp")
 public class TurretTest extends LinearOpMode {
 
-    private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
+    // Vision and AprilTag
+    private static final boolean USE_WEBCAM = true;
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
 
-    private static final double MANUAL_TURRET_SPEED_DEG = 1.0; // Degrees per loop
+    // Turret Constants
+    private static final double MANUAL_TURRET_SPEED_DEG = 1.0;
     private static final double SERVO_MIN = 0.0;
     private static final double SERVO_MAX = 1.0;
-    private static final double SERVO_GEAR_RATIO = 3.5;
-    private static final double TURRET_HOME_ANGLE = 0.0; // Home position in degrees
+    private static final double SERVO_TO_TURRET_GEAR_RATIO = 3.5;
+    private static final double TURRET_HOME_ANGLE = 0.0; // Home pos in deg (forward)
 
-    // Proportional gain for turret correction.
-    // Higher values will cause the turret to react faster, but may overshoot.
-    final double TURN_GAIN = 0.02; // Adjusted gain for degree-based control
+    // Old simple gain (kept for reference), but Auto now uses PID below
+    final double TURN_GAIN = 0.02;
+
+    // State machine modes
+    private static final int STATE_SELECT_TEAM = 0;
+    private static final int STATE_SELECT_MODE = 1;
+    private static final int STATE_MANUAL_RUN = 2;
+    private static final int STATE_AUTO_RUN = 3;
+
+    // -------------------- PID / Auto Aim Parameters --------------------
+    // Starting PID values (conservative). Tune on the robot for best behavior.
+    private double kP = 0.02;   // proportional term (roughly similar to previous TURN_GAIN)
+    private double kI = 0.00005;
+    private double kD = 0.0015;
+
+    // runtime PID state
+    private double integral = 0.0;
+    private double lastError = 0.0;
+    private ElapsedTime pidTimer = new ElapsedTime();
+    private ElapsedTime targetLostTimer = new ElapsedTime();
+
+    // Deadband and power-to-angle conversion / limits
+    private static final double POSITION_TOLERANCE = 1.5; // degrees tolerance to consider "on target"
+    private static final double MIN_OUTPUT = 0.02;       // minimum PID output (to overcome stiction)
+    private static final double MAX_OUTPUT = 4.0;        // max PID output (interpreted as degrees per loop)
+    private static final double TARGET_LOST_TIMEOUT = 0.5; // seconds before we commit to return home
+
+    // track last servo position to avoid wrap jumps
+    private double lastServoPos = 0.5;
 
     @Override
     public void runOpMode() {
-        DcMotor frontLeftMotor = hardwareMap.dcMotor.get("fl");
-        DcMotor backLeftMotor = hardwareMap.dcMotor.get("bl");
-        DcMotor frontRightMotor = hardwareMap.dcMotor.get("fr");
-        DcMotor backRightMotor = hardwareMap.dcMotor.get("br");
-
-        Servo turretLeft = hardwareMap.get(Servo.class, "turretLeft");
+        // --- Hardware Initialization ---
+        DcMotor frontLeftMotor = null;
+        DcMotor backLeftMotor = null;
+        DcMotor frontRightMotor = null;
+        DcMotor backRightMotor = null;
+        Servo turretLeft = null;
         Servo turretRight = null;
 
-        initAprilTag(); // April Tag Init
-
         try {
-            turretRight = hardwareMap.get(Servo.class, "turretRight");
-        } catch (Exception e) {
-            telemetry.addLine("Single servo mode (turretRight not found)");
-        }
-        telemetry.addLine("Awaiting User start... ");
-        telemetry.update();
+            frontLeftMotor = hardwareMap.dcMotor.get("fl");
+            backLeftMotor = hardwareMap.dcMotor.get("bl");
+            frontRightMotor = hardwareMap.dcMotor.get("fr");
+            backRightMotor = hardwareMap.dcMotor.get("br");
+            turretLeft = hardwareMap.get(Servo.class, "turretLeft");
 
+            // Attempt to get the second servo, but don't fail if it's not there.
+            try {
+                turretRight = hardwareMap.get(Servo.class, "turretRight");
+            } catch (Exception e) {
+                telemetry.addLine("Single servo mode (turretRight not found)");
+            }
+
+        } catch (Exception e) {
+            telemetry.addLine("CRITICAL ERROR: A required hardware device is missing.");
+            telemetry.addLine(e.getMessage());
+            telemetry.update();
+            // Terminate the OpMode gracefully if essential hardware is missing.
+            sleep(5000);
+            return;
+        }
+
+        // --- AprilTag Initialization ---
+        initAprilTag();
+
+        // --- Motor Configuration ---
         frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
+
+        // --- Variable Initialization ---
         double turretAngle = TURRET_HOME_ANGLE;
-        int mode = 0;
-        int team_id = 0;
-        int team = 0;
+        int currentState = STATE_SELECT_TEAM;
+        int targetTagId = -1;
+        boolean targetVisibleLastLoop = false;
+        pidTimer.reset();
+        targetLostTimer.reset();
+
+        telemetry.addLine("Initialization Complete. Awaiting Start...");
+        telemetry.update();
 
         waitForStart();
 
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
-            // Robot Driving Logic (common to both modes)
+            // Robot Driving Logic (runs in all states)
             double y = -gamepad1.left_stick_y;
             double x = gamepad1.left_stick_x * 1.1;
             double rx = gamepad1.right_stick_x;
@@ -93,94 +138,196 @@ public class TurretTest extends LinearOpMode {
             frontRightMotor.setPower(frontRightPower);
             backRightMotor.setPower(backRightPower);
 
-            while (opModeIsActive() && team_id == 0) {
+
+            // --- State Machine :) ---
+            // TODO: Needs to be hardcoded to TELEOP for COMP
+
+            // State 0: Choose Alliance
+            if (currentState == STATE_SELECT_TEAM) {
                 telemetry.addLine("Press X for Blue team, Y for Red team");
-                telemetry.update();
                 if (gamepad1.x) {
-                    team_id = 20; // Blue Alliance Tag ID
-                    team = 1;
-
+                    targetTagId = 20; // Example Blue Alliance Tag ID
+                    currentState = STATE_SELECT_MODE;
                 } else if (gamepad1.y) {
-                    team_id = 24; // Red Alliance Tag ID
-                    team = 2;
+                    targetTagId = 24; // Example Red Alliance Tag ID
+                    currentState = STATE_SELECT_MODE;
                 }
             }
-            while (opModeIsActive() && mode == 0) { // User chooses mode
-                telemetry.addLine("Press A for manual, B for Auto Turret (with manual drive)");
-                telemetry.update();
+            // State 1: Choose Turret Mode
+            else if (currentState == STATE_SELECT_MODE) {
+                telemetry.addLine("Press A for Manual Turret, B for Auto Turret");
                 if (gamepad1.a) {
-                    mode = 1;
+                    currentState = STATE_MANUAL_RUN;
                 } else if (gamepad1.b) {
-                    mode = 2;
+                    currentState = STATE_AUTO_RUN;
                 }
             }
-
-            // Turret Control Logic
-            if (mode == 1) { // Manual Mode
+            // State 2: Manual Turret Control
+            else if (currentState == STATE_MANUAL_RUN) {
+                telemetry.addData("Mode", "Manual");
                 double turretInput = 0.0;
-
                 if (gamepad1.left_bumper) {
                     turretInput = -1.0;
                 } else if (gamepad1.right_bumper) {
                     turretInput = 1.0;
                 }
-
                 turretAngle += turretInput * MANUAL_TURRET_SPEED_DEG;
+            }
 
-                if (gamepad1.a) {
-                    turretAngle = TURRET_HOME_ANGLE;
-                }
-            } else { // Auto Turret
+            // State 3: Automatic Turret Control (PID-based)
+            else if (currentState == STATE_AUTO_RUN) {
+                telemetry.addData("Mode", "Auto");
                 AprilTagDetection targetTag = null;
                 List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
                 for (AprilTagDetection detection : currentDetections) {
-                    if (detection.metadata != null && detection.id == team_id) {
+                    if (detection.metadata != null && detection.id == targetTagId) {
                         targetTag = detection;
-                        break;
+                        break; // Found the target, stop searching
                     }
                 }
 
+                double dt = pidTimer.seconds();
+                pidTimer.reset();
+                if (dt < 1e-3) dt = 1e-3;      // defensive
+                if (dt > 1.0) dt = 1.0;       // cap in case loop stalled
+
                 if (targetTag != null) {
-                    // Yaw error states how far from center the tag is
-                    double yaw = targetTag.ftcPose.yaw;
+                    // Reset lost-target timer
+                    targetLostTimer.reset();
 
-                    // A positive yaw error = target is to the left
-                    turretAngle -= (yaw * TURN_GAIN);
+                    // targetTag.ftcPose.yaw units may be radians or degrees depending on pipeline.
+                    // Heuristic: if magnitude <= 2*pi, assume radians and convert to degrees.
+                    double rawYaw = targetTag.ftcPose.yaw;
+                    double yawDeg = rawYaw;
+                    if (Math.abs(rawYaw) <= (2.0 * Math.PI + 1e-6)) {
+                        yawDeg = Math.toDegrees(rawYaw);
+                    }
+                    // yawDeg is the horizontal offset in degrees. Goal: bring yawDeg -> 0.
+                    double error = yawDeg; // error in degrees (positive if target to the right)
 
+                    // PID calculations (on degrees)
+                    integral += error * dt;
+                    // simple anti-windup clamp
+                    integral = Range.clip(integral, -100.0, 100.0);
+                    double derivative = (error - lastError) / dt;
+
+                    double pidOutput = (kP * error) + (kI * integral) + (kD * derivative);
+
+                    // Deadband: if within tolerance, zero output and clear integral
+                    if (Math.abs(error) < POSITION_TOLERANCE) {
+                        pidOutput = 0.0;
+                        integral = 0.0;
+                    } else {
+                        // enforce minimum effective output to overcome friction (preserve sign)
+                        if (Math.abs(pidOutput) < MIN_OUTPUT) {
+                            pidOutput = MIN_OUTPUT * Math.signum(pidOutput);
+                        }
+                    }
+
+                    // Clamp pidOutput to a reasonable per-loop degree delta (so we move smoothly)
+                    // Here pidOutput is treated as *degrees* to APPLY to turretAngle per loop.
+                    double maxDegPerLoop = MAX_OUTPUT; // degrees per loop iteration (conservative)
+                    double appliedDeg = Range.clip(pidOutput, -maxDegPerLoop, maxDegPerLoop);
+
+                    // Update turret logical angle (note sign convention: target to right -> positive yaw -> we want to +angle to aim right)
+                    // In prior code you used turretAngle -= yawError * TURN_GAIN; here we follow "positive yaw -> rotate turret positive"
+                    turretAngle += appliedDeg;
+
+                    lastError = error;
+
+                    // Telemetry
                     telemetry.addData("Target Found", "ID: %d", targetTag.id);
-                    telemetry.addData("Yaw Error", "%.2f degrees", yaw);
+                    telemetry.addData("Raw yaw", "%.4f", rawYaw);
+                    telemetry.addData("Yaw (deg)", "%.2f", yawDeg);
+                    telemetry.addData("Error (deg)", "%.2f", error);
+                    telemetry.addData("PID out (deg)", "%.3f", pidOutput);
+                    telemetry.addData("AppliedDeg", "%.3f", appliedDeg);
                 } else {
-                    telemetry.addLine("Target not visible.");
+                    // No target found in detections
+                    // If we recently lost the target, let the turret coast (do nothing).
+                    // If it's been missing longer than TARGET_LOST_TIMEOUT, return to home.
+                    if (targetLostTimer.seconds() < TARGET_LOST_TIMEOUT) {
+                        telemetry.addData("Status", "TRACKING LOST - Coasting");
+                        telemetry.addData("Time Lost", "%.2f s", targetLostTimer.seconds());
+                        // do not modify turretAngle (coast)
+                    } else {
+                        telemetry.addData("Status", "Target not visible. Returning to home.");
+                        // gently interpolate back to home to avoid jumps
+                        double wrapped = (turretAngle % 360 + 360) % 360;
+                        double diffToHome = TURRET_HOME_ANGLE - wrapped;
+                        // pick shortest path around circular domain
+                        if (diffToHome > 180) diffToHome -= 360;
+                        if (diffToHome < -180) diffToHome += 360;
+                        // move a small step towards home
+                        double homeStep = 3.0; // degrees per loop (conservative)
+                        if (Math.abs(diffToHome) < homeStep) {
+                            turretAngle = TURRET_HOME_ANGLE;
+                        } else {
+                            turretAngle += Math.signum(diffToHome) * homeStep;
+                        }
+                        // reset PID so integral doesn't carry over once new target appears
+                        integral = 0;
+                        lastError = 0;
+                    }
                 }
             }
 
+            if ((currentState == STATE_MANUAL_RUN || currentState == STATE_AUTO_RUN) && gamepad1.start) {
+                turretAngle = TURRET_HOME_ANGLE;
+            }
+
+
             double wrappedAngle = (turretAngle % 360 + 360) % 360;
 
-            double normalizedTurretPos = wrappedAngle / 360.0;
-            double servoPos = (normalizedTurretPos / SERVO_GEAR_RATIO);
-
-            servoPos = (servoPos % 1.0 + 1.0) % 1.0;
-            servoPos = Range.clip(servoPos, SERVO_MIN, SERVO_MAX);
+            double servoPos = getServoPosSafe(wrappedAngle);
 
             turretLeft.setPosition(servoPos);
             if (turretRight != null) {
-                turretRight.setPosition(1.0 - servoPos);
+                turretRight.setPosition(servoPos);
             }
 
-            telemetry.addData("Mode", mode == 1 ? "Manual" : "Auto");
+
+            // --- Telemetry ---
             telemetry.addData("Turret Angle (Logical)", "%.2f", turretAngle);
             telemetry.addData("Turret Angle (Wrapped)", "%.2f", wrappedAngle);
             telemetry.addData("Servo Position", "%.3f", servoPos);
             telemetry.update();
         }
     }
+    private double getServoPosSafe(double wrappedAngleDegrees) {
+        // normalized turret rotation 0..1
+        double turretRot = wrappedAngleDegrees / 360.0; // in [0,1)
+        double servoRotations = turretRot * SERVO_TO_TURRET_GEAR_RATIO; // could be >1
+
+        // fractional part in [0,1)
+        double frac = servoRotations - Math.floor(servoRotations);
+
+        // Choose the equivalent value (frac + n) that is nearest lastServoPos to avoid large jumps.
+        double best = frac;
+        double minDiff = Math.abs(best - lastServoPos);
+
+        // consider neighbors ±1 (in case lastServoPos near edges)
+        for (int k = -1; k <= 1; k++) {
+            double candidate = frac + k;
+            double diff = Math.abs(candidate - lastServoPos);
+            if (diff < minDiff) {
+                minDiff = diff;
+                best = candidate;
+            }
+        }
+
+        // ensure final is in 0..1 for servo.setPosition()
+        double servoPos = Range.clip(best, SERVO_MIN, SERVO_MAX);
+        lastServoPos = servoPos;
+        return servoPos;
+    }
 
     private void initAprilTag() {
-        // Create the AprilTag processor the easy way.
+        // Create the AprilTag processor.
         aprilTag = AprilTagProcessor.easyCreateWithDefaults();
 
-        // Create the vision portal the easy way.
+        // Create the vision portal.
         if (USE_WEBCAM) {
             visionPortal = VisionPortal.easyCreateWithDefaults(
                     hardwareMap.get(WebcamName.class, "Webcam 1"), aprilTag);

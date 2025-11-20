@@ -1,7 +1,8 @@
 package org.firstinspires.ftc.teamcode.teleOp;
 
-import org.firstinspires.ftc.teamcode.Hware.hwMap;
+import org.firstinspires.ftc.teamcode.Hware.hwMapExt;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
+import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.subsystems.GameState;
 import org.firstinspires.ftc.teamcode.subsystems.RobotState;
 
@@ -9,14 +10,20 @@ public class StateMachine {
     private RobotState currentRobotState = RobotState.INIT;
     private GameState currentGameState = GameState.IDLE;
     private final DriveTrain m_driveTrain;
-    private final hwMap hardware;
+    private final Turret m_turret;
+    private final hwMapExt hardware;
+
+    private int alliance = 1; // 1 = Blue, 2 = Red;
     
     private boolean endgameTriggered = false;
     private double matchTime = 0;
 
-    public StateMachine(hwMap hardwareMap) {
+    public StateMachine(hwMapExt hardwareMap) {
         this.hardware = hardwareMap;
         this.m_driveTrain = new DriveTrain(hardware);
+        this.m_turret = new Turret(hardware);
+
+        m_turret.setAlliance(alliance);
 
         setRobotState(RobotState.DISABLED);
         setGameState(GameState.IDLE);
@@ -172,7 +179,7 @@ public class StateMachine {
 
     public GameState getGameState() { return currentGameState; }
 
-    public hwMap getHardware() {
+    public hwMapExt getHardware() {
         return hardware;
     }
 
