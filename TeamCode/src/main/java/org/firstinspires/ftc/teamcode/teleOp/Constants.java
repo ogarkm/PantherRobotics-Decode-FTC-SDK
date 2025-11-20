@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.teleOp;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
 public class Constants {
 
@@ -63,6 +64,17 @@ public class Constants {
         public static final double IDLE_POWER = 0;
     }
 
+    public static class LiftConstants{
+        public static final String PTO_LEFT = "ptoLeft";
+        public static final String PTO_RIGHT = "ptoRight";
+
+        public static final double PTO_LOCK = 0.0;
+        public static final double PTO_UNLOCK = 1;
+
+        public static final Servo.Direction CW = Servo.Direction.FORWARD;
+        public static final Servo.Direction CCW = Servo.Direction.REVERSE;
+
+    }
     // Controller Constants
 //    public static class ControllerConstants {
 //        // Controller deadzones

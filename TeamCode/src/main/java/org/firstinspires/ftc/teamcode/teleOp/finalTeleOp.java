@@ -49,6 +49,9 @@ public class finalTeleOp extends LinearOpMode {
             if (gamepad1.back) {
                 stateMachine.emergencyStop();
             }
+            if(gamepad1.start){
+                stateMachine.setGameState(GameState.LIFTING);
+            }
 
             // Telemetry
             telemetry.addData("Robot State", stateMachine.getCurrentRobotState());
