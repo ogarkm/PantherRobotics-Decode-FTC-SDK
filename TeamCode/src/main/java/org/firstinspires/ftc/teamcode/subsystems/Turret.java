@@ -1,13 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystems;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.Range;
 
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.teamcode.Hware.hwMapExt;
-import org.firstinspires.ftc.teamcode.teleOp.Constants;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 public class Turret {
