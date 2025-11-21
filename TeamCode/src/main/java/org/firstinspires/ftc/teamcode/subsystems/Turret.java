@@ -10,179 +10,112 @@ import org.firstinspires.ftc.teamcode.Hware.hwMapExt;
 import org.firstinspires.ftc.teamcode.teleOp.Constants;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
-
 public class Turret {
 
-    private final hwMapExt hardware;
-    private double turretPower = Constants.TurretConstants.TURRET_POWER;
-    private int alliance; // Used for Tracking
+    private static final int BLUE_TAG = 20;
+    private static final int RED_TAG = 24;
 
-    private int[] apriltags = {20, 24};
-    private AprilTagDetection apriltag;
-    private double turretAngle = Constants.TurretConstants.TURRET_HOME_ANGLE;
+    private static final double SERVO_MIN = 0.0;
+    private static final double SERVO_MAX = 1.0;
 
+    private static final double MAX_TURRET_DEG = 250;
+    private static final double SERVO_RANGE_DEG = 300;
 
-    private double kP = Constants.TurretConstants.kP;
-    private double kI = Constants.TurretConstants.kI;
-    private double kD = Constants.TurretConstants.kD;
+    // PID tuned for 10–20 FPS Logitech (idk)
+    private static final double KP = 0.015;
+    private static final double KI = 0.0001;
+    private static final double KD = 0.0015;
 
+    private static final double MAX_PID_OUTPUT = 5;   // deg per update
+    private static final double DEADZONE = 1.2;       // ignore tiny errors
+
+    private final ServoEx turretServo;
+
+    private double turretAngleDeg = 0;
     private double integral = 0;
     private double lastError = 0;
-    private double lastServoPos = 0.5;
 
-    private final ElapsedTime pidTimer = new ElapsedTime();
-    private final ElapsedTime lostTimer = new ElapsedTime();
+    private int alliance = 1;
+    private ElapsedTime loopTimer = new ElapsedTime();
 
-    private static final double POSITION_TOLERANCE = 1.5;
-    private static final double MIN_OUTPUT = 0.02;
-    private static final double MAX_OUTPUT = 4.0;
-    private static final double LOST_TIMEOUT = 0.5;
-
-    public enum TurretState {
-        LAUNCH,
-        IDLE,
-        EXTAKE,
-        RESET
-    }
-    private TurretState currentState = TurretState.IDLE;
-
-    public Turret(hwMapExt hardware) {
-        this.hardware = hardware;
+    public Turret(hwMapExt hw) {
+        turretServo = new ServoEx(hw, "turretServo");
+        loopTimer.reset();
     }
 
-    public void setAlliance(int alliance) {
-        this.alliance = alliance;
+    public void setAlliance(int a) {
+        alliance = (a == 1 || a == 2) ? a : 1;
     }
 
-    public void stop() {
-        if (currentState != TurretState.IDLE) {
-            setTurretState(TurretState.IDLE);
+    public void update(AprilTagDetection tag) {
+        double dt = loopTimer.seconds();
+        loopTimer.reset();
+        if (dt <= 0) dt = 0.01;
+
+        if (tag == null || !isCorrectTag(tag.id)) {
+            holdPosition();
+            return;
         }
 
-        hardware.turretOff();
-    }
+        double yawDeg = tag.ftcPose.yaw;
 
-    public void launchTurret() {
-        hardware.setTurretPower(turretPower);
-    }
+        yawDeg = lowPass(yawDeg, 0.3);
 
-    public void setLaunchPower(double power) {
-        this.turretPower = power;
-    }
+        double error = yawDeg;
 
-    private void resetTurret() {
-        hardware.initAprilTag();
-    }
+        if (Math.abs(error) < DEADZONE) error = 0;
 
-    public void autoLockLogic() {
+        integral += error * dt;
+        double derivative = (error - lastError) / dt;
+        lastError = error;
 
-        apriltag = hardware.getAprilTagById(apriltags[alliance - 1]);
+        double pid = KP * error + KI * integral + KD * derivative;
+        pid = clamp(pid, -MAX_PID_OUTPUT, MAX_PID_OUTPUT);
 
-        double dt = pidTimer.seconds();
-        pidTimer.reset();
-        if (dt < 1e-3) dt = 1e-3;
-        if (dt > 1.0) dt = 1.0;
-
-        if (apriltag != null) {
-
-            lostTimer.reset();
-
-            double rawYaw = apriltag.ftcPose.yaw;
-            double yawDeg = Math.toDegrees(rawYaw);
-
-            double error = yawDeg;
-            integral += error * dt;
-            integral = Range.clip(integral, -100, 100);
-
-            double derivative = (error - lastError) / dt;
-            derivative = Range.clip(derivative, -200, 200);
-
-            double output = (kP * error) + (kI * integral) + (kD * derivative);
-
-            if (Math.abs(error) < POSITION_TOLERANCE) {
-                output = 0;
-                integral = 0;
-            }
-
-            double appliedDeg = Range.clip(output, -MAX_OUTPUT, MAX_OUTPUT);
-
-            turretAngle += appliedDeg;
-            lastError = error;
-        }
-        else {
-            if (lostTimer.seconds() < LOST_TIMEOUT) {
-            } else {
-                double wrapped = (turretAngle % 360 + 360) % 360;
-                double diff = Constants.TurretConstants.TURRET_HOME_ANGLE - wrapped;
-
-                if (diff > 180) diff -= 360;
-                if (diff < -180) diff += 360;
-
-                double step = 3.0;
-                if (Math.abs(diff) < step) {
-                    turretAngle = Constants.TurretConstants.TURRET_HOME_ANGLE;
-                } else {
-                    turretAngle += Math.signum(diff) * step;
-                }
-
-                integral = 0;
-                lastError = 0;
-            }
+        turretAngleDeg += pid;
+        if (Math.abs(turretAngleDeg) > MAX_TURRET_DEG) {
+            if (turretAngleDeg > 0) turretAngleDeg -= 360;
+            else turretAngleDeg += 360;
         }
 
-        double wrappedAngle = (turretAngle % 360 + 360) % 360;
-        double servoPos = getServoPosSafe(wrappedAngle);
-        hardware.setTurretPos(servoPos);
+        setServoToAngle(turretAngleDeg);
     }
 
-    private double getServoPosSafe(double wrappedAngleDegrees) {
 
-        double turretRot = wrappedAngleDegrees / 360.0;
-        double servoRot = turretRot * Constants.TurretConstants.SERVO_TO_TURRET_GEAR_RATIO;
+    private void setServoToAngle(double angleDeg) {
+        double normalized = angleDeg / SERVO_RANGE_DEG;
+        while (normalized < 0) normalized += 1;
+        while (normalized > 1) normalized -= 1;
+        normalized = clamp(normalized, SERVO_MIN, SERVO_MAX);
+        turretServo.setPosition(normalized);
+    }
 
-        double frac = servoRot - Math.floor(servoRot);
+    private boolean isCorrectTag(int id) {
+        return alliance == 1 ? id == BLUE_TAG : id == RED_TAG;
+    }
 
-        double best = frac;
-        double minDiff = Math.abs(frac - lastServoPos);
+    private void holdPosition() {
+        setServoToAngle(turretAngleDeg); // freeze turret
+    }
 
-        for (int k = -1; k <= 1; k++) {
-            double cand = frac + k;
-            double diff = Math.abs(cand - lastServoPos);
-            if (diff < minDiff) {
-                minDiff = diff;
-                best = cand;
-            }
+    private double lowPass(double input, double factor) {
+        // Smoother yaw = less jitter
+        return (factor * input) + (1 - factor) * lastError;
+    }
+
+    private double clamp(double v, double min, double max) {
+        return Math.max(min, Math.min(max, v));
+    }
+
+    public static class ServoEx {
+        private final com.qualcomm.robotcore.hardware.Servo servo;
+
+        public ServoEx(hwMapExt hw, String id) {
+            servo = hw.turretservo;
         }
 
-        double servoPos = Range.clip(best,
-                Constants.TurretConstants.SERVO_MIN,
-                Constants.TurretConstants.SERVO_MAX);
-
-        lastServoPos = servoPos;
-        return servoPos;
-    }
-
-    public void setTurretState(TurretState state) {
-        this.currentState = state;
-
-        switch (state) {
-            case LAUNCH:
-                launchTurret();
-                break;
-            case IDLE:
-                hardware.turretOff();
-                break;
-            case EXTAKE:
-                hardware.setTurretPower(Constants.TurretConstants.EXTAKE_POWER);
-                break;
-            case RESET:
-                resetTurret();
-                hardware.turretOff();
-                break;
+        public void setPosition(double p) {
+            servo.setPosition(p);
         }
     }
-    public TurretState getTurretState() {
-        return currentState;
-    }
-
 }
