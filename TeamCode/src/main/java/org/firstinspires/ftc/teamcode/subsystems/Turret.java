@@ -114,4 +114,7 @@ public class Turret {
             servo.setPosition(p);
         }
     }
+    public void stop(){
+        holdPosition();
+    }
 }
