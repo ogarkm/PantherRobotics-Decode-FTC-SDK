@@ -12,23 +12,15 @@ public class Constants {
         public static final String FRONT_RIGHT_MOTOR = "fr";
         public static final String BACK_LEFT_MOTOR = "bl";
         public static final String BACK_RIGHT_MOTOR = "br";
-
-
         public static final DcMotorSimple.Direction FRONT_LEFT_DIRECTION = DcMotorSimple.Direction.REVERSE;
         public static final DcMotorSimple.Direction FRONT_RIGHT_DIRECTION = DcMotorSimple.Direction.FORWARD;
         public static final DcMotorSimple.Direction BACK_LEFT_DIRECTION = DcMotorSimple.Direction.REVERSE;
         public static final DcMotorSimple.Direction BACK_RIGHT_DIRECTION = DcMotorSimple.Direction.FORWARD;
-
-        public static DcMotor.ZeroPowerBehavior MOTOR_ZERO_POWER_BEHAVIOR = DcMotor.ZeroPowerBehavior.BRAKE;
-
-        public static DcMotor.RunMode MOTOR_RUNMODE = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
-
-        public static final double TRACK_WIDTH = 13.5; // inches (distance between left and right wheels)
-        public static final double WHEEL_BASE = 13.5; // inches (distance between front and back wheels)
-        public static final double WHEEL_DIAMETER = 4.0; // inches
+        public static final double TRACK_WIDTH = 13.5;
+        public static final double WHEEL_BASE = 13.5;
+        public static final double WHEEL_DIAMETER = 4.0;
         public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
-        public static final double TICKS_PER_REVOLUTION = 537.6; // GoBILDA 5202 Yellow Jacket
-        public static final double TICKS_PER_INCH = TICKS_PER_REVOLUTION / WHEEL_CIRCUMFERENCE;
+        public static final double TICKS_PER_REVOLUTION = 537.6;
 
         // Drive characteristics
         public static final double MAX_VELOCITY = 30.0; // inches per second
@@ -44,8 +36,9 @@ public class Constants {
         public static final double TURN_kI = 0.0;
         public static final double TURN_kD = 0.0;
 
-        public static final double NORMAL_SPEED_MULTIPLIER = 1.0;
-        public static final double PRECISION_SPEED_MULTIPLIER = 0.4;
+        public static final double STOP_SPEED_MULTIPLIER = 0.0;
+        public static final double PRECISION_SPEED_MULTIPLIER = 0.3;
+        public static final double NORMAL_SPEED_MULTIPLIER = 0.6;
         public static final double TURBO_SPEED_MULTIPLIER = 1.0;
     }
 

@@ -1,27 +1,37 @@
 package org.firstinspires.ftc.teamcode.teleOp;
 
-import org.firstinspires.ftc.teamcode.Hware.hwMapExt;
+import org.firstinspires.ftc.teamcode.subsystems.hwMap;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
-import org.firstinspires.ftc.teamcode.subsystems.GameState;
-import org.firstinspires.ftc.teamcode.subsystems.RobotState;
+
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Lift;
 
+enum RobotState {
+    INIT,
+    TELEOP,
+    ESTOP
+}
+enum GameState {
+    // Generic states that work for any season
+    INTAKING,           // Collecting game elements
+    EXTAKING,
+    SCORING,            // Scoring in goals/backboard
+    LIFTING,           // Hanging/Climbing
+    IDLE
+}
+
 
 public class StateMachine {
+
     private RobotState currentRobotState = RobotState.INIT;
     private GameState currentGameState = GameState.IDLE;
     private final DriveTrain m_driveTrain;
-    private final hwMapExt hardware;
     private final Intake m_intake;
     private final Lift m_lift;
-
-
-    public StateMachine(hwMapExt hardwareMap) {
-        this.hardware = hardwareMap;
-        this.m_driveTrain = new DriveTrain(hardware);
-        this.m_intake = new Intake(hardware);
-        this.m_lift = new Lift(hardware);
+    public StateMachine(hwMap.LiftHwMap h_lift, hwMap.DriveHwMap h_driveTrain, hwMap.IntakeHwMap h_intake) {
+        this.m_driveTrain = new DriveTrain(h_driveTrain);
+        this.m_intake = new Intake(h_intake);
+        this.m_lift = new Lift(h_lift, h_driveTrain);
 
         setRobotState(RobotState.INIT);
         setGameState(GameState.IDLE);
@@ -44,42 +54,35 @@ public class StateMachine {
     }
 
     private void handleGameStateExit(GameState oldState) {
-        // Clean up previous game state
+        m_intake.setIntakeState(Intake.IntakeState.IDLE);
+        m_lift.setLiftState(Lift.LiftState.IDLE);
         switch (oldState) {
             case INTAKING:
-                m_intake.setIntakeState(Intake.IntakeState.IDLE);
                 break;
             case SCORING:
-                // Retract scoring mechanism, etc.
                 break;
         }
     }
 
     private void handleGameStateEntry(GameState newState) {
-        // Configure subsystems for new game state
         switch (newState) {
             case INTAKING:
-                // Start intake motors, lower intake, etc.
                 m_driveTrain.setDriveState(DriveTrain.DriveState.NORMAL);
                 m_intake.setIntakeState(Intake.IntakeState.INTAKE);
                 break;
             case EXTAKING:
-                // Start intake motors, lower intake, etc.
                 m_driveTrain.setDriveState(DriveTrain.DriveState.NORMAL);
                 m_intake.setIntakeState(Intake.IntakeState.EXTAKE);
                 break;
             case SCORING:
-                // Prepare scoring mechanism, precision drive
                 m_driveTrain.setDriveState(DriveTrain.DriveState.PRECISION);
                 m_intake.setIntakeState(Intake.IntakeState.IDLE);
                 break;
             case LIFTING:
-                // Slow, careful movements for climbing
                 m_driveTrain.setDriveState(DriveTrain.DriveState.STOP);
                 m_intake.setIntakeState(Intake.IntakeState.IDLE);
                 break;
             case IDLE:
-                // Aggressive drive mode
                 m_driveTrain.setDriveState(DriveTrain.DriveState.STOP);
                 m_intake.setIntakeState(Intake.IntakeState.IDLE);
                 break;
@@ -100,6 +103,7 @@ public class StateMachine {
             case TELEOP:
                 m_driveTrain.setDriveState(DriveTrain.DriveState.NORMAL);
                 m_intake.setIntakeState(Intake.IntakeState.IDLE);
+                m_lift.setLiftState(Lift.LiftState.LIFT_DOWN);
                 break;
             case ESTOP:
                 m_driveTrain.setDriveState(DriveTrain.DriveState.STOP);
@@ -121,13 +125,10 @@ public class StateMachine {
                 break;
         }
     }
-
-
     public void emergencyStop() {
         setRobotState(RobotState.ESTOP);
         setGameState(GameState.IDLE);
     }
-
     public DriveTrain getDriveTrain() {
         return m_driveTrain;
     }
@@ -137,10 +138,4 @@ public class StateMachine {
     public RobotState getCurrentRobotState() {
         return currentRobotState;
     }
-
-
-    public hwMapExt getHardware() {
-        return hardware;
-    }
-
 }

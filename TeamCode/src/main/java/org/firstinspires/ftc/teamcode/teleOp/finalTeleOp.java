@@ -3,10 +3,9 @@ package org.firstinspires.ftc.teamcode.teleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Hware.hwMapExt;
+import org.firstinspires.ftc.teamcode.subsystems.hwMap;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
-import org.firstinspires.ftc.teamcode.subsystems.RobotState;
-import org.firstinspires.ftc.teamcode.subsystems.GameState;
+
 
 @TeleOp(name="FinalTeleOp", group="FINAL")
 public class finalTeleOp extends LinearOpMode {
@@ -15,8 +14,11 @@ public class finalTeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        hwMapExt hardware = new hwMapExt(hardwareMap);
-        stateMachine = new StateMachine(hardware);
+        hwMap.LiftHwMap h_lift = new hwMap.LiftHwMap(hardwareMap);
+        hwMap.DriveHwMap h_driveTrain = new hwMap.DriveHwMap(hardwareMap);
+        hwMap.IntakeHwMap h_intake = new hwMap.IntakeHwMap(hardwareMap);
+
+        stateMachine = new StateMachine(h_lift, h_driveTrain, h_intake);
 
         waitForStart();
         stateMachine.setRobotState(RobotState.TELEOP);
@@ -35,14 +37,12 @@ public class finalTeleOp extends LinearOpMode {
             } else {
                 stateMachine.getDriveTrain().setDriveState(DriveTrain.DriveState.NORMAL);
             }
-            // --- intake control (both intakes together) ---
+
             if (gamepad1.right_bumper) {
                 stateMachine.setGameState(GameState.INTAKING);
             } else if (gamepad1.left_bumper) {
-                // intake out
                 stateMachine.setGameState(GameState.EXTAKING);
             } else {
-                // no buttons -> stop intake
                 stateMachine.setGameState(GameState.IDLE);
             }
 
