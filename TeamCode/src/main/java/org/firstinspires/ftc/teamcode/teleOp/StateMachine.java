@@ -11,9 +11,7 @@ public class StateMachine {
     private GameState currentGameState = GameState.IDLE;
     private final DriveTrain m_driveTrain;
     private final hwMapExt hardware;
-    private final Intake m_intake; 
-
-
+    private final Intake m_intake;
     public StateMachine(hwMapExt hardwareMap) {
         this.hardware = hardwareMap;
         this.m_driveTrain = new DriveTrain(hardware);
@@ -22,7 +20,6 @@ public class StateMachine {
         setRobotState(RobotState.INIT);
         setGameState(GameState.IDLE);
     }
-
     public void setRobotState(RobotState newState) {
         if (this.currentRobotState == newState) return;
 
@@ -30,7 +27,6 @@ public class StateMachine {
         this.currentRobotState = newState;
         handleRobotStateEntry(newState);
     }
-
     public void setGameState(GameState newState) {
         if (this.currentGameState == newState) return;
 
