@@ -1,10 +1,9 @@
-package org.firstinspires.ftc.teamcode.teleOp;
+package org.firstinspires.ftc.teamcode.teleOp.teleOp;
 
-import org.firstinspires.ftc.teamcode.subsystems.hwMap;
-import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
-
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.Lift;
+import org.firstinspires.ftc.teamcode.teleOp.subsystems.DriveTrain;
+import org.firstinspires.ftc.teamcode.teleOp.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.teleOp.subsystems.Lift;
+import org.firstinspires.ftc.teamcode.teleOp.subsystems.hwMap;
 
 enum RobotState {
     INIT,
@@ -132,7 +131,7 @@ public class StateMachine {
     public DriveTrain getDriveTrain() {
         return m_driveTrain;
     }
-    public Intake getIntake() {                            
+    public Intake getIntake() {
         return m_intake;
     }
     public RobotState getCurrentRobotState() {

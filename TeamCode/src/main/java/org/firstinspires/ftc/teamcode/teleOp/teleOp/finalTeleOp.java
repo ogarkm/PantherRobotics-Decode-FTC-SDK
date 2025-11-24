@@ -1,10 +1,10 @@
-package org.firstinspires.ftc.teamcode.teleOp;
+package org.firstinspires.ftc.teamcode.teleOp.teleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.subsystems.hwMap;
-import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
+import org.firstinspires.ftc.teamcode.teleOp.subsystems.DriveTrain;
+import org.firstinspires.ftc.teamcode.teleOp.subsystems.hwMap;
 
 
 @TeleOp(name="FinalTeleOp", group="FINAL")

@@ -1,6 +1,6 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.teleOp.subsystems;
 
-import org.firstinspires.ftc.teamcode.teleOp.Constants;
+import org.firstinspires.ftc.teamcode.teleOp.teleOp.Constants;
 
 public class Intake {
     private double runPower = 1;
@@ -11,11 +11,11 @@ public class Intake {
         IDLE,
         STOP
     }
-    private Intake.IntakeState currentState = Intake.IntakeState.IDLE;
+    private IntakeState currentState = IntakeState.IDLE;
     public Intake(hwMap.IntakeHwMap hardware) {
         this.h_intake = hardware;
     }
-    public void setIntakeState(Intake.IntakeState state) {
+    public void setIntakeState(IntakeState state) {
         this.currentState = state;
 
         switch (state) {
