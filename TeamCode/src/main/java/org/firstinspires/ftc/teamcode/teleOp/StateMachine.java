@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.teleOp;
 
-import org.firstinspires.ftc.teamcode.subsystems.hwMap;
+import org.firstinspires.ftc.teamcode.Hware.hwMap;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 
 import org.firstinspires.ftc.teamcode.subsystems.Intake;

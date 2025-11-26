@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.Hware.hwMap;
 import org.firstinspires.ftc.teamcode.teleOp.Constants;
 
 public class Lift {

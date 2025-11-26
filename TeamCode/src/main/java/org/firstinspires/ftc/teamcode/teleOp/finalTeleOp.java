@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.teleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.subsystems.hwMap;
+import org.firstinspires.ftc.teamcode.Hware.hwMap;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 
 
