@@ -68,6 +68,23 @@ public class Constants {
         public static final Servo.Direction CCW = Servo.Direction.REVERSE;
 
     }
+
+    public static class TransferConstants {
+        public static final String LIFT_SERVO_A = "flickA";
+        public static final String LIFT_SERVO_B = "flickB";
+        public static final String LIFT_SERVO_C = "flickC";
+
+
+        public static final String INDEX_SENSOR_A = "indexSensorA";
+        public static final String INDEX_SENSOR_B = "indexSensorB";
+        public static final String INDEX_SENSOR_C = "indexSensorC";
+
+
+        // Lift Constants - TODO TUNE THESE PLS
+        public static final double FLICK_POS_UP = 160; // with POS 0 at the top, with cw rotation
+        public static final double FLICK_POS_DOWN = 30; // with POS 0 at the top, with cw rotation
+
+    }
     // Controller Constants
 //    public static class ControllerConstants {
 //        // Controller deadzones
