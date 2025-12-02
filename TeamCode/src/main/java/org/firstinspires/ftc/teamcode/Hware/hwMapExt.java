@@ -57,8 +57,8 @@ public class hwMapExt {
         frontRightMotor.setDirection(DriveConstants.FRONT_RIGHT_DIRECTION);
         backRightMotor.setDirection(DriveConstants.BACK_RIGHT_DIRECTION);
 
-        setMotorZero(DriveConstants.MOTOR_ZERO_POWER_BEHAVIOR);
-        setMotorModes(DriveConstants.MOTOR_RUNMODE);
+        setMotorZero(DcMotor.ZeroPowerBehavior.BRAKE);
+        setMotorModes(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         //transfer system start
         flickA = hardwareMap.servo.get(TransferConstants.LIFT_SERVO_A);

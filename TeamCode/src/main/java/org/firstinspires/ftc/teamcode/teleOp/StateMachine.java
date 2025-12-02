@@ -5,6 +5,7 @@ import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Lift;
+import org.firstinspires.ftc.teamcode.subsystems.TransferSys;
 
 enum RobotState {
     INIT,
@@ -28,10 +29,15 @@ public class StateMachine {
     private final DriveTrain m_driveTrain;
     private final Intake m_intake;
     private final Lift m_lift;
-    public StateMachine(hwMap.LiftHwMap h_lift, hwMap.DriveHwMap h_driveTrain, hwMap.IntakeHwMap h_intake) {
+
+    private final TransferSys m_transfer;
+
+
+    public StateMachine(hwMap.LiftHwMap h_lift, hwMap.DriveHwMap h_driveTrain, hwMap.IntakeHwMap h_intake, hwMap.TransferHwMap h_transfer) {
         this.m_driveTrain = new DriveTrain(h_driveTrain);
         this.m_intake = new Intake(h_intake);
         this.m_lift = new Lift(h_lift, h_driveTrain);
+        this.m_transfer = new TransferSys(h_transfer);
 
         setRobotState(RobotState.INIT);
         setGameState(GameState.IDLE);
@@ -58,8 +64,10 @@ public class StateMachine {
         m_lift.setLiftState(Lift.LiftState.IDLE);
         switch (oldState) {
             case INTAKING:
+                m_transfer.setTransferState(TransferSys.TransferState.INDEXING);
                 break;
             case SCORING:
+                m_transfer.setTransferState(TransferSys.TransferState.STOP);
                 break;
         }
     }
@@ -77,6 +85,7 @@ public class StateMachine {
             case SCORING:
                 m_driveTrain.setDriveState(DriveTrain.DriveState.PRECISION);
                 m_intake.setIntakeState(Intake.IntakeState.IDLE);
+                m_transfer.setTransferState(TransferSys.TransferState.FLICKING);
                 break;
             case LIFTING:
                 m_driveTrain.setDriveState(DriveTrain.DriveState.STOP);

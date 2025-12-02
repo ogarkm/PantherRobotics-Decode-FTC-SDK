@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode.subsystems;
-import org.firstinspires.ftc.teamcode.Hware.hwMapExt;
+import org.firstinspires.ftc.teamcode.Hware.hwMap;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 public class TransferSys {
-    private final hwMapExt hardware;
+    private final hwMap.TransferHwMap hardware;
 
     private final int[] artifactColors = {0, 0, 0};
     private int[] motif = {2, 1, 1};
@@ -17,7 +17,7 @@ public class TransferSys {
     }
     private TransferState currentState = TransferState.IDLING;
 
-    public TransferSys(hwMapExt hardware) {
+    public TransferSys(hwMap.TransferHwMap hardware) {
         this.hardware = hardware;
     }
 
@@ -26,8 +26,6 @@ public class TransferSys {
         if (currentState != TransferState.STOP) {
             setTransferState(TransferState.STOP);
         }
-
-        hardware.stopMotors();
     }
 
     public void indexAllArtifacts() {

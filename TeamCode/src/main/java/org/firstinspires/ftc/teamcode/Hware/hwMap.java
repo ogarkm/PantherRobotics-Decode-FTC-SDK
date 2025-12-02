@@ -1,10 +1,16 @@
 package org.firstinspires.ftc.teamcode.Hware;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.SwitchableLight;
 
+import org.firstinspires.ftc.teamcode.subsystems.TransferSys;
 import org.firstinspires.ftc.teamcode.teleOp.Constants;
 
 public class hwMap {
@@ -123,4 +129,82 @@ public class hwMap {
             return (int) (inches * (ticksPerRev * gearRatio) / circumference);
         }
     }
+
+    public static class TransferHwMap {
+        public Servo flickA;
+        public Servo flickB;
+        public Servo flickC;
+
+        public NormalizedColorSensor indexA;
+        public NormalizedColorSensor indexB;
+        public NormalizedColorSensor indexC;
+
+        public Servo[] lifts;
+        public NormalizedColorSensor[] sensors;
+
+        public TransferHwMap(HardwareMap hardwareMap) {
+            flickA = hardwareMap.servo.get(Constants.TransferConstants.LIFT_SERVO_A);
+            flickB = hardwareMap.servo.get(Constants.TransferConstants.LIFT_SERVO_B);
+            flickC = hardwareMap.servo.get(Constants.TransferConstants.LIFT_SERVO_C);
+
+            indexA = hardwareMap.get(NormalizedColorSensor.class, Constants.TransferConstants.INDEX_SENSOR_A);
+            indexB = hardwareMap.get(NormalizedColorSensor.class, Constants.TransferConstants.INDEX_SENSOR_B);
+            indexC = hardwareMap.get(NormalizedColorSensor.class, Constants.TransferConstants.INDEX_SENSOR_C);
+
+            NormalizedColorSensor[] sensors = { indexA, indexB, indexC };
+            Servo[] lifts = {flickA, flickB, flickC};
+
+            for (NormalizedColorSensor sensor : sensors) {
+                if (sensor instanceof SwitchableLight) {
+                    ((SwitchableLight) sensor).enableLight(true);
+                }
+            }
+        }
+
+        public void checkFlickPos() {
+            for (Servo servo : lifts) {
+                if (servo.getPosition() == Constants.TransferConstants.FLICK_POS_UP) {
+                    servo.setPosition(Constants.TransferConstants.FLICK_POS_DOWN);
+                }
+            }
+        }
+
+        public void setTransferPos(int index, boolean up) { // index takes 1, 2, 3
+
+            lifts[index - 1].setPosition(
+                    up ? Constants.TransferConstants.FLICK_POS_UP : Constants.TransferConstants.FLICK_POS_DOWN
+            );
+        }
+
+
+        public int detectArtifactColor(int index) {
+            // Read color
+            NormalizedRGBA colors = sensors[index-1].getNormalizedColors();
+
+            // Convert to HSV
+            float[] hsv = new float[3];
+            Color.colorToHSV(colors.toColor(), hsv);
+
+            float hue = hsv[0];
+            float sat = hsv[1];
+            float val = hsv[2];
+            if (sat < 0.2 || val < 0.1) {
+                return 0; // unable to view
+            }
+
+            // PURPLE RANGE
+            if (hue > 260 && hue < 300) {
+                return 1;
+            }
+
+            // GREEN RANGE
+            if (hue > 80 && hue < 160) {
+                return 2;
+            }
+
+            return 0; // could be error, or could be no artifact... *sigh*
+        }
+
+    }
+
 }

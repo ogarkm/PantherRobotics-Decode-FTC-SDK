@@ -17,8 +17,9 @@ public class finalTeleOp extends LinearOpMode {
         hwMap.LiftHwMap h_lift = new hwMap.LiftHwMap(hardwareMap);
         hwMap.DriveHwMap h_driveTrain = new hwMap.DriveHwMap(hardwareMap);
         hwMap.IntakeHwMap h_intake = new hwMap.IntakeHwMap(hardwareMap);
+        hwMap.TransferHwMap h_transfer = new hwMap.TransferHwMap(hardwareMap);
 
-        stateMachine = new StateMachine(h_lift, h_driveTrain, h_intake);
+        stateMachine = new StateMachine(h_lift, h_driveTrain, h_intake, h_transfer);
 
         waitForStart();
         stateMachine.setRobotState(RobotState.TELEOP);
